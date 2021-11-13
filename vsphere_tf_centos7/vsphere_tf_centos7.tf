@@ -12,6 +12,10 @@ variable "ip_address" {
   type = string
 }
 
+variable "ssh_password" {
+  type = string
+}
+
 provider "vsphere" {
   user			= "administrator@vsphere.local"
   password		= var.vsphere_password
@@ -43,7 +47,7 @@ data "vsphere_virtual_machine" "template" {
   datacenter_id = "${data.vsphere_datacenter.dc.id}"
 }
 
-resource "vsphere_virtual_machine" "vm" {
+resource "vsphere_virtual_machine" "centos7" {
   name             = var.vm_name
   resource_pool_id = "${data.vsphere_compute_cluster.cluster.resource_pool_id}"
   datastore_id     = "${data.vsphere_datastore.datastore.id}"
@@ -81,6 +85,19 @@ resource "vsphere_virtual_machine" "vm" {
       }
 
       ipv4_gateway = "10.10.0.1"
+      dns_server_list = ["192.168.1.250", "192.168.1.251"]
+      dns_suffix_list = ["local.lan"]
+    }
+  }
+
+    # Execute script on remote vm after this creation
+  provisioner "remote-exec" {
+    script = "scripts/yum_update.sh"
+    connection {
+      type     = "ssh"
+      user     = "root"
+      password = var.ssh_password
+      host     = vsphere_virtual_machine.centos7.default_ip_address 
     }
   }
 }
