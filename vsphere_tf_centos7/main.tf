@@ -1,8 +1,6 @@
 # Deploy CentOS7 VMs
 
 provider "vault" {
-  # address = "http://127.0.0.1:8200"
-  # token = "s.CcY5aohdq7rGcsICi1JvmzSO"
 }
 data "vault_generic_secret" "vsphere_username" {
   path = "secret/vsphere/vcsa"
