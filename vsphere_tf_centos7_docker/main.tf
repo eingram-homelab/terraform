@@ -1,59 +1,55 @@
-# Deploy CentOS7 VM
-
-variable "vsphere_password" {
-  type = string
-}
-
-variable "vm_name" {
-  type = string
-}
-
-variable "ip_address" {
-  type = string
-}
-
-variable "ssh_password" {
-  type = string
-}
+# Deploy CentOS7 Docker VMs (3)
 
 provider "vsphere" {
   user			= "administrator@vsphere.local"
-  password		= var.vsphere_password
-  vsphere_server 	= "vcsa.local.lan"
+  password		= "${var.vsphere_password}"
+  vsphere_server 	= "${var.vsphere_server}"
   allow_unverified_ssl	= true
 }
 
 data "vsphere_datacenter" "dc" {
-  name = "HomeLab Datacenter"
+  name = "${var.vsphere_datacenter}"
 }
 
 data "vsphere_datastore" "datastore" {
-  name          = "XN_iSCSI_SSD2"
+  name          = "${var.vsphere_datastore}"
   datacenter_id = "${data.vsphere_datacenter.dc.id}"
 }
 
 data "vsphere_compute_cluster" "cluster" {
-  name          = "Intel NUC10 Cluster"
+  name          = "${var.vsphere_compute_cluster}"
   datacenter_id = "${data.vsphere_datacenter.dc.id}"
 }
 
 data "vsphere_network" "network" {
-  name          = "Lab-LAN1"
+  name          = "${var.vsphere_network}"
   datacenter_id = "${data.vsphere_datacenter.dc.id}"
 }
 
 data "vsphere_virtual_machine" "template" {
-  name          = "TMP-Centos7_Packer_2021_11"
+  name          = "${var.vsphere_template}"
   datacenter_id = "${data.vsphere_datacenter.dc.id}"
 }
 
-resource "vsphere_virtual_machine" "centos7" {
-  name             = var.vm_name
+resource "vsphere_folder" "folder" {
+  path             = "${var.vm_folder}"
+  type             = "vm"
+  datacenter_id    = "${data.vsphere_datacenter.dc.id}"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "vsphere_virtual_machine" "docker" {
+  count            = length(var.ip_address_list)
+  name             = "${var.vm_name}${count.index+1}"
   resource_pool_id = "${data.vsphere_compute_cluster.cluster.resource_pool_id}"
   datastore_id     = "${data.vsphere_datastore.datastore.id}"
+  folder           = "${var.vm_folder}"
 
-  num_cpus = 2
-  memory   = 4096
+  num_cpus = 1
+  memory   = 1024
   guest_id = "${data.vsphere_virtual_machine.template.guest_id}"
 
   scsi_type = "${data.vsphere_virtual_machine.template.scsi_type}"
@@ -75,29 +71,40 @@ resource "vsphere_virtual_machine" "centos7" {
 
     customize {
       linux_options {
-        host_name = var.vm_name
+        host_name = "${var.vm_name}${count.index+1}"
         domain    = "local.lan"
       }
 
       network_interface {
-        ipv4_address = var.ip_address
+        ipv4_address = element(var.ip_address_list, count.index)
         ipv4_netmask = 24
       }
 
       ipv4_gateway = "10.10.0.1"
-      dns_server_list = ["192.168.1.250", "192.168.1.251"]
-      dns_suffix_list = ["local.lan"]
+      dns_server_list = "${var.dns_server_list}"
+      dns_suffix_list = "${var.dns_suffix_list}"
     }
   }
 
-    # Execute script on remote vm after this creation
+  lifecycle {
+    prevent_destroy = true
+  }
+
+  # We run this to make sure server is initialized before we run the "local exec"
   provisioner "remote-exec" {
-    script = "scripts/yum_update.sh"
+    inline = ["echo 'Waiting for server to be initialized...'"]
+
     connection {
-      type     = "ssh"
-      user     = "root"
-      password = var.ssh_password
-      host     = vsphere_virtual_machine.centos7.default_ip_address 
+      type        = "ssh"
+      agent       = false
+      host        = self.private_ip
+      user        = "eingram"
+      password    = "${var.ssh_password}"
+
     }
+  }
+
+  provisioner "local-exec" {
+    command = ansible-playbook ~/Ansible/playbooks/deploy_new_server.yaml -kK --extra-vars 'newhost="${var.vm_name}${count.index+1}.local.lan"'
   }
 }
