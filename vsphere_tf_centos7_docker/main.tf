@@ -113,8 +113,24 @@ resource "vsphere_virtual_machine" "docker" {
   #   prevent_destroy = true
   # }
 
+  provisioner "file" {
+    source       = "~/code/Terraform/files/post_script.sh"
+    destination  = "/home/eingram/post_script.sh"
+  }
+
+    connection {
+      type        = "ssh"
+      agent       = false
+      host        = self.clone.0.customize.0.network_interface.0.ipv4_address
+      user        = "${data.vault_generic_secret.ssh_username.data["ssh_username"]}"
+      password    = "${data.vault_generic_secret.ssh_password.data["ssh_password"]}"
+
+    }
+
   provisioner "remote-exec" {
     inline = [
+      "chmod +x /home/eingram/post_script.sh",
+      "echo ${data.vault_generic_secret.ssh_password.data["ssh_password"]} | sudo -S /home/eingram/post_script.sh",
       "mkdir ~/.ssh",
       "chmod 755 ~/.ssh",
       "touch ~/.ssh/authorized_keys",

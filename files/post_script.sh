@@ -1,0 +1,1 @@
+echo 'eingram ALL=(ALL:ALL) NOPASSWD: ALL' | tee /etc/sudoers.d/eingram
