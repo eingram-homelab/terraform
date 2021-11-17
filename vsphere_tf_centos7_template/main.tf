@@ -56,7 +56,15 @@ resource "vsphere_folder" "folder" {
   # }
 }
 
-resource "vsphere_virtual_machine" "centos7" {
+resource "null_resource" "pihole_customlist_copy" {
+  provisioner "local-exec" {
+    command = <<-EOT
+      ansible-playbook ../../Ansible/playbooks/terraform/tf_update_pihole.yaml
+    EOT
+  }
+}
+
+resource "vsphere_virtual_machine" "vm" {
   count            = length(var.ip_address_list)
   name             = "${var.vm_name}${count.index+1}"
   resource_pool_id = "${data.vsphere_compute_cluster.cluster.resource_pool_id}"
@@ -105,7 +113,6 @@ resource "vsphere_virtual_machine" "centos7" {
   #   prevent_destroy = true
   # }
 
-  # We run this to make sure server is initialized before we run the "local exec"
   provisioner "remote-exec" {
     inline = [
       "mkdir ~/.ssh",
@@ -127,7 +134,15 @@ resource "vsphere_virtual_machine" "centos7" {
 
   provisioner "local-exec" {
     command = <<-EOT
-      ansible-playbook ../../Ansible/playbooks/misc/deploy_new_server.yaml --extra-vars "newhost=${var.vm_name}${count.index+1}.local.lan newip=${element(var.ip_address_list, count.index)}"
+      ansible-playbook ../../Ansible/playbooks/terraform/tf_deploy_new_server.yaml --extra-vars "newhost=${var.vm_name}${count.index+1}.local.lan newip=${element(var.ip_address_list, count.index)}"
+    EOT
+  }
+}
+
+resource "null_resource" "pihole_update" {
+  provisioner "local-exec" {
+    command = <<-EOT
+      ansible-playbook ../../Ansible/playbooks/terraform/tf_update_pihole.yaml
     EOT
   }
 }
