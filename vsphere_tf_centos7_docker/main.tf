@@ -1,8 +1,23 @@
-# Deploy CentOS7 Docker VMs (3)
+# Deploy CentOS7 VMs
+
+provider "vault" {
+}
+data "vault_generic_secret" "vsphere_username" {
+  path = "secret/vsphere/vcsa"
+}
+data "vault_generic_secret" "vsphere_password" {
+  path = "secret/vsphere/vcsa"
+}
+data "vault_generic_secret" "ssh_username" {
+  path = "secret/ssh/eingram"
+}
+data "vault_generic_secret" "ssh_password" {
+  path = "secret/ssh/eingram"
+}
 
 provider "vsphere" {
-  user			= "administrator@vsphere.local"
-  password		= "${var.vsphere_password}"
+  user			= "${data.vault_generic_secret.vsphere_username.data["vsphere_username"]}"
+  password		= "${data.vault_generic_secret.vsphere_password.data["vsphere_password"]}"
   vsphere_server 	= "${var.vsphere_server}"
   allow_unverified_ssl	= true
 }
@@ -36,8 +51,16 @@ resource "vsphere_folder" "folder" {
   type             = "vm"
   datacenter_id    = "${data.vsphere_datacenter.dc.id}"
 
-  lifecycle {
-    prevent_destroy = true
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
+}
+
+resource "null_resource" "pihole_customlist_copy" {
+  provisioner "local-exec" {
+    command = <<-EOT
+      ansible-playbook ../../Ansible/playbooks/terraform/tf_update_pihole.yaml
+    EOT
   }
 }
 
@@ -86,25 +109,40 @@ resource "vsphere_virtual_machine" "docker" {
     }
   }
 
-  lifecycle {
-    prevent_destroy = true
-  }
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
 
-  # We run this to make sure server is initialized before we run the "local exec"
   provisioner "remote-exec" {
-    inline = ["echo 'Waiting for server to be initialized...'"]
+    inline = [
+      "mkdir ~/.ssh",
+      "chmod 755 ~/.ssh",
+      "touch ~/.ssh/authorized_keys",
+      "chmod 600 ~/.ssh/authorized_keys",
+      "echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQClXgpzukaegu/puhLlf3omPF09pISe0S6VqKblMidQA9z0Uyn3aThsrtZJvokirlCm5zDPuqKkZ8GHsot2bonLnwLzfv+5wFANEaJzLL9WbH8SmoqHyAOVkmEzXcNCimHCsrfkWMID5klft4dPt0oULcAmvYEKlwvPqpm6kvQs2hDU8VEVGBDKYytSKbAbijJDz1cJBCkJAP9IKcGW6Q/RiWuetzzO2nGvCdX4H94Y66DO60zLPokbV+oeFrKnMcAHL4OZ+LxCAN61mMyXYDk4Yb8vxD8q8WF+6ncQBYZaEgBk0jQUHwfDCnQ4KwO8UTuI8OMB/9Iq2glSjVhmi/OY7LbbO/dYYCPQkcC/UkG4TQmJGsNlsyEyyeFof9zvTLQsS6QJjz6ru6ezRa5+roXifh7pbDe5L0rGW8InOieUxnH+J0I6kgEFkdP8r4gdrpu4HNiqqQ4A0e79kU8iH+tk3bkRxNbGllhtrVUt4dLgQOqYkHql7oB3POD9sAQGZA0= edwardingram@MacBook-Pro.local.lan' >> ~/.ssh/authorized_keys"
+    ]
 
     connection {
       type        = "ssh"
       agent       = false
-      host        = self.private_ip
-      user        = "eingram"
-      password    = "${var.ssh_password}"
+      host        = self.clone.0.customize.0.network_interface.0.ipv4_address
+      user        = "${data.vault_generic_secret.ssh_username.data["ssh_username"]}"
+      password    = "${data.vault_generic_secret.ssh_password.data["ssh_password"]}"
 
     }
   }
 
   provisioner "local-exec" {
-    command = ansible-playbook ~/Ansible/playbooks/deploy_new_server.yaml -kK --extra-vars 'newhost="${var.vm_name}${count.index+1}.local.lan"'
+    command = <<-EOT
+      ansible-playbook ../../Ansible/playbooks/terraform/tf_deploy_new_server.yaml --extra-vars "newhost=${var.vm_name}${count.index+1}.local.lan newip=${element(var.ip_address_list, count.index)}"
+    EOT
+  }
+}
+
+resource "null_resource" "pihole_update" {
+  provisioner "local-exec" {
+    command = <<-EOT
+      ansible-playbook ../../Ansible/playbooks/terraform/tf_update_pihole.yaml
+    EOT
   }
 }

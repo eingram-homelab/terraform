@@ -1,8 +1,11 @@
-variable "vsphere_user" {
-    default = ""
+variable "vsphere_username" {
+  default = ""
+  sensitive = true
 }
 
 variable "vsphere_password" {
+  default = ""
+  sensitive = true
 }
 
 variable "vsphere_server" {
@@ -10,7 +13,6 @@ default = ""
 }
 
 variable "vm_name" {
-    default = ""
 }
 
 variable "vsphere_datacenter" {
@@ -63,8 +65,15 @@ variable "vsphere_hardware_version" {
 
 }
 
-variable "ssh_password" {
+variable "ssh_username" {
+  default = ""
   type = string
+  sensitive = true
+}
+variable "ssh_password" {
+  default = ""
+  type = string
+  sensitive = true
 }
   
 variable "ip_address_list" {
