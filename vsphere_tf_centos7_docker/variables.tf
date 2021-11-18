@@ -90,3 +90,8 @@ variable "dns_suffix_list" {
     type = list
     default = []
 }
+
+variable "ansible_group" {
+    type = string
+    default = ""
+}

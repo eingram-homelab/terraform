@@ -6,6 +6,7 @@ vsphere_datastore = "XN_iSCSI_SSD2"
 vm_folder = "Docker"
 vsphere_network = "Lab-LAN1"
 vsphere_template = "TMP-Centos7_Packer_2021_11"
+ansible_group = "Docker"
 
 ip_address_list = [
     "10.10.0.80",

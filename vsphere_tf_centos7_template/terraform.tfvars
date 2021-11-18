@@ -6,6 +6,7 @@ vsphere_datastore = "XN_iSCSI_SSD2"
 vm_folder = "Terraform Provisioned"
 vsphere_network = "Lab-LAN1"
 vsphere_template = "TMP-Centos7_Packer_2021_11"
+ansible_group = "Temp"
 
 ip_address_list = [
     "10.10.0.25",
