@@ -50,23 +50,11 @@ resource "vsphere_folder" "folder" {
   path             = "${var.vm_folder}"
   type             = "vm"
   datacenter_id    = "${data.vsphere_datacenter.dc.id}"
-
-  # lifecycle {
-  #   prevent_destroy = true
-  # }
 }
 
-resource "null_resource" "pihole_customlist_copy" {
-  provisioner "local-exec" {
-    command = <<-EOT
-      ansible-playbook ../../Ansible/playbooks/terraform/tf_update_pihole.yaml
-    EOT
-  }
-}
-
-resource "vsphere_virtual_machine" "docker" {
-  count            = length(var.ip_address_list)
-  name             = "${var.vm_name}${count.index+1}"
+resource "vsphere_virtual_machine" "vm" {
+  count            = 1
+  name             = "${var.vm_name}}"
   resource_pool_id = "${data.vsphere_compute_cluster.cluster.resource_pool_id}"
   datastore_id     = "${data.vsphere_datastore.datastore.id}"
   folder           = "${var.vm_folder}"
@@ -94,12 +82,12 @@ resource "vsphere_virtual_machine" "docker" {
 
     customize {
       linux_options {
-        host_name = "${var.vm_name}${count.index+1}"
+        host_name = "${var.vm_name}"
         domain    = "local.lan"
       }
 
       network_interface {
-        ipv4_address = element(var.ip_address_list, count.index)
+        ipv4_address = "${var.ip_address}"
         ipv4_netmask = 24
       }
 
@@ -130,12 +118,7 @@ resource "vsphere_virtual_machine" "docker" {
   provisioner "remote-exec" {
     inline = [
       "chmod +x /home/eingram/post_script.sh",
-      "echo ${data.vault_generic_secret.ssh_password.data["ssh_password"]} | sudo -S /home/eingram/post_script.sh",
-      "mkdir ~/.ssh",
-      "chmod 755 ~/.ssh",
-      "touch ~/.ssh/authorized_keys",
-      "chmod 600 ~/.ssh/authorized_keys",
-      "echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQClXgpzukaegu/puhLlf3omPF09pISe0S6VqKblMidQA9z0Uyn3aThsrtZJvokirlCm5zDPuqKkZ8GHsot2bonLnwLzfv+5wFANEaJzLL9WbH8SmoqHyAOVkmEzXcNCimHCsrfkWMID5klft4dPt0oULcAmvYEKlwvPqpm6kvQs2hDU8VEVGBDKYytSKbAbijJDz1cJBCkJAP9IKcGW6Q/RiWuetzzO2nGvCdX4H94Y66DO60zLPokbV+oeFrKnMcAHL4OZ+LxCAN61mMyXYDk4Yb8vxD8q8WF+6ncQBYZaEgBk0jQUHwfDCnQ4KwO8UTuI8OMB/9Iq2glSjVhmi/OY7LbbO/dYYCPQkcC/UkG4TQmJGsNlsyEyyeFof9zvTLQsS6QJjz6ru6ezRa5+roXifh7pbDe5L0rGW8InOieUxnH+J0I6kgEFkdP8r4gdrpu4HNiqqQ4A0e79kU8iH+tk3bkRxNbGllhtrVUt4dLgQOqYkHql7oB3POD9sAQGZA0= edwardingram@MacBook-Pro.local.lan' >> ~/.ssh/authorized_keys"
+      "echo ${data.vault_generic_secret.ssh_password.data["ssh_password"]} | sudo -S /home/eingram/post_script.sh"
     ]
 
     connection {
@@ -148,17 +131,11 @@ resource "vsphere_virtual_machine" "docker" {
     }
   }
 
-  # provisioner "local-exec" {
-  #   command = <<-EOT
-  #     ansible-playbook ../../Ansible/playbooks/terraform/tf_deploy_new_server.yaml --extra-vars "group=${var.ansible_group} newhost=${var.vm_name}${count.index+1}.local.lan newip=${element(var.ip_address_list, count.index)}"
-  #   EOT
-  # }
+  provisioner "local-exec" {
+    command = <<-EOT
+      ansible-playbook ../../Ansible/playbooks/terraform/tf_deploy_new_server.yaml --extra-vars "group=${var.ansible_group} newhost=${var.vm_name}.local.lan newip=${var.ip_address}"
+    EOT
+  }
 }
 
-# resource "null_resource" "pihole_update" {
-#   provisioner "local-exec" {
-#     command = <<-EOT
-#       ansible-playbook ../../Ansible/playbooks/terraform/tf_update_pihole.yaml
-#     EOT
-#   }
-# }
+
