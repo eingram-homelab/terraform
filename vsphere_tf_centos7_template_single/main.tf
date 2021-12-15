@@ -54,7 +54,7 @@ resource "vsphere_folder" "folder" {
 
 resource "vsphere_virtual_machine" "vm" {
   count            = 1
-  name             = "${var.vm_name}}"
+  name             = "${var.vm_name}"
   resource_pool_id = "${data.vsphere_compute_cluster.cluster.resource_pool_id}"
   datastore_id     = "${data.vsphere_datastore.datastore.id}"
   folder           = "${var.vm_folder}"
