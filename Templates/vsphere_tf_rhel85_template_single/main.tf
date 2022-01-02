@@ -1,4 +1,4 @@
-# Deploy CentOS7 VMs
+# Deploy RHEL8.5 VMs
 
 provider "vault" {
 }
@@ -13,6 +13,12 @@ data "vault_generic_secret" "ssh_username" {
 }
 data "vault_generic_secret" "ssh_password" {
   path = "secret/ssh/eingram"
+}
+data "vault_generic_secret" "sub_email" {
+  path = "secret/rhel/dev"
+}
+data "vault_generic_secret" "sub_password" {
+  path = "secret/rhel/dev"
 }
 
 provider "vsphere" {
@@ -53,14 +59,14 @@ resource "vsphere_folder" "folder" {
 }
 
 resource "vsphere_virtual_machine" "vm" {
-  count            = length(var.ip_address_list)
-  name             = "${var.vm_name}${count.index+1}"
+  count            = 1
+  name             = "${var.vm_name}"
   resource_pool_id = "${data.vsphere_compute_cluster.cluster.resource_pool_id}"
   datastore_id     = "${data.vsphere_datastore.datastore.id}"
   folder           = "${var.vm_folder}"
 
-  num_cpus = 1
-  memory   = 1024
+  num_cpus = "${var.vm_cpu}"
+  memory   = "${var.vm_ram}"
   guest_id = "${data.vsphere_virtual_machine.template.guest_id}"
 
   scsi_type = "${data.vsphere_virtual_machine.template.scsi_type}"
@@ -82,12 +88,12 @@ resource "vsphere_virtual_machine" "vm" {
 
     customize {
       linux_options {
-        host_name = "${var.vm_name}${count.index+1}"
+        host_name = "${var.vm_name}"
         domain    = "local.lan"
       }
 
       network_interface {
-        ipv4_address = element(var.ip_address_list, count.index)
+        ipv4_address = "${var.ip_address}"
         ipv4_netmask = 24
       }
 
@@ -117,6 +123,7 @@ resource "vsphere_virtual_machine" "vm" {
 
   provisioner "remote-exec" {
     inline = [
+      "echo ${data.vault_generic_secret.ssh_password.data["ssh_password"]} | sudo -S subscription-manager register --force --username ${data.vault_generic_secret.sub_email.data["sub_email"]} --password ${data.vault_generic_secret.sub_password.data["sub_password"]} --auto-attach",
       "chmod +x /home/eingram/post_script.sh",
       "echo ${data.vault_generic_secret.ssh_password.data["ssh_password"]} | sudo -S /home/eingram/post_script.sh"
     ]
@@ -133,8 +140,9 @@ resource "vsphere_virtual_machine" "vm" {
 
   provisioner "local-exec" {
     command = <<-EOT
-      ansible-playbook ../../Ansible/playbooks/terraform/tf_deploy_new_server.yaml --extra-vars "group=${var.ansible_group} newhost=${var.vm_name}${count.index+1}.local.lan newip=${element(var.ip_address_list, count.index)}"
+      ansible-playbook ../../Ansible/playbooks/terraform/tf_deploy_new_server.yaml --extra-vars "group=${var.ansible_group} newhost=${var.vm_name}.local.lan newip=${var.ip_address}"
     EOT
   }
 }
+
 

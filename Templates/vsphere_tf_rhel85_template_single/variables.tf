@@ -15,6 +15,12 @@ default = ""
 variable "vm_name" {
 }
 
+variable "vm_ram" {
+}
+
+variable "vm_cpu" {
+}
+
 variable "vsphere_datacenter" {
 default = ""
 }
@@ -75,10 +81,22 @@ variable "ssh_password" {
   type = string
   sensitive = true
 }
+
+variable "sub_email" {
+  default = ""
+  type = string
+  sensitive = true
+}
+
+variable "sub_password" {
+  default = ""
+  type = string
+  sensitive = true
+}
   
-variable "ip_address_list" {
-    type = list
-    default = []
+variable "ip_address" {
+    type = string
+    default = ""
 }
 
 variable "dns_server_list" {
