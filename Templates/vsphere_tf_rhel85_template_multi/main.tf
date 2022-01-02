@@ -91,7 +91,7 @@ resource "vsphere_virtual_machine" "vm" {
         ipv4_netmask = 24
       }
 
-      ipv4_gateway = "10.10.0.1"
+      ipv4_gateway = "${var.ip_gateway}"
       dns_server_list = "${var.dns_server_list}"
       dns_suffix_list = "${var.dns_suffix_list}"
     }

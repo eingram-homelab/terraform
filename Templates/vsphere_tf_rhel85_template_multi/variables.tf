@@ -99,6 +99,10 @@ variable "ip_address_list" {
     default = []
 }
 
+variable "ip_gateway" {
+  type = string
+}
+
 variable "dns_server_list" {
     type = list
     default = []
