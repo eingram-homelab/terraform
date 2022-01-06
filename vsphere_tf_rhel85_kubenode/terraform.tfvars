@@ -14,14 +14,14 @@ dns_suffix_list = [
 
 vsphere_datastore = "XN_iSCSI_SSD2"
 vsphere_network = "Lab-LAN1"
-vm_folder = "Terraform Provisioned" 
-ansible_group = "Temp" 
-vm_name = "Test" 
+vm_folder = "Kubernetes" 
+ansible_group = "kubernetes" 
+vm_name = "kubenode" 
 ip_address_list = [
     "10.10.0.25",
-    # "10.10.0.81",
-    # "10.10.0.82"
+    "10.10.0.26",
+    "10.10.0.27"
 ]
 ip_gateway = "10.10.0.1"
 vm_ram = 2048
-vm_cpu = 1
+vm_cpu = 2
