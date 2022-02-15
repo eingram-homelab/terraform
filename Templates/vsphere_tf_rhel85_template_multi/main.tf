@@ -22,74 +22,75 @@ data "vault_generic_secret" "sub_password" {
 }
 
 provider "vsphere" {
-  user			= "${data.vault_generic_secret.vsphere_username.data["vsphere_username"]}"
-  password		= "${data.vault_generic_secret.vsphere_password.data["vsphere_password"]}"
-  vsphere_server 	= "${var.vsphere_server}"
+  user			= data.vault_generic_secret.vsphere_username.data["vsphere_username"]
+  password		= data.vault_generic_secret.vsphere_password.data["vsphere_password"]
+  vsphere_server 	= var.vsphere_server
   allow_unverified_ssl	= true
 }
 
 data "vsphere_datacenter" "dc" {
-  name = "${var.vsphere_datacenter}"
+  name = var.vsphere_datacenter
 }
 
 data "vsphere_datastore" "datastore" {
-  name          = "${var.vsphere_datastore}"
-  datacenter_id = "${data.vsphere_datacenter.dc.id}"
+  name          = var.vsphere_datastore
+  datacenter_id = data.vsphere_datacenter.dc.id
 }
 
 data "vsphere_compute_cluster" "cluster" {
-  name          = "${var.vsphere_compute_cluster}"
-  datacenter_id = "${data.vsphere_datacenter.dc.id}"
+  name          = var.vsphere_compute_cluster
+  datacenter_id = data.vsphere_datacenter.dc.id
 }
 
 data "vsphere_network" "network" {
-  name          = "${var.vsphere_network}"
-  datacenter_id = "${data.vsphere_datacenter.dc.id}"
+  name          = var.vsphere_network
+  datacenter_id = data.vsphere_datacenter.dc.id
 }
 
 data "vsphere_virtual_machine" "template" {
-  name          = "${var.vsphere_template}"
-  datacenter_id = "${data.vsphere_datacenter.dc.id}"
+  name          = var.vsphere_template
+  datacenter_id = data.vsphere_datacenter.dc.id
 }
 
 resource "vsphere_folder" "folder" {
-  path             = "${var.vm_folder}"
+  path             = var.vm_folder
   type             = "vm"
-  datacenter_id    = "${data.vsphere_datacenter.dc.id}"
+  datacenter_id    = data.vsphere_datacenter.dc.id
 }
 
 resource "vsphere_virtual_machine" "vm" {
   count            = length(var.ip_address_list)
   name             = "${var.vm_name}${count.index+1}"
-  resource_pool_id = "${data.vsphere_compute_cluster.cluster.resource_pool_id}"
-  datastore_id     = "${data.vsphere_datastore.datastore.id}"
-  folder           = "${var.vm_folder}"
+  resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
+  datastore_id     = data.vsphere_datastore.datastore.id
+  folder           = var.vm_folder
+  firmware = "efi"
 
-  num_cpus = "${var.vm_cpu}"
-  memory   = "${var.vm_ram}"
-  guest_id = "${data.vsphere_virtual_machine.template.guest_id}"
+  num_cpus = var.vm_cpu
+  memory   = var.vm_ram
+  guest_id = data.vsphere_virtual_machine.template.guest_id
 
-  scsi_type = "${data.vsphere_virtual_machine.template.scsi_type}"
+  scsi_type = data.vsphere_virtual_machine.template.scsi_type
 
   network_interface {
-    network_id   = "${data.vsphere_network.network.id}"
-    adapter_type = "${data.vsphere_virtual_machine.template.network_interface_types[0]}"
+    network_id   = data.vsphere_network.network.id
+    adapter_type = data.vsphere_virtual_machine.template.network_interface_types[0]
   }
 
   disk {
     label            = "disk0"
-    size             = "${data.vsphere_virtual_machine.template.disks.0.size}"
-    eagerly_scrub    = "${data.vsphere_virtual_machine.template.disks.0.eagerly_scrub}"
-    thin_provisioned = "${data.vsphere_virtual_machine.template.disks.0.thin_provisioned}"
+    size             = data.vsphere_virtual_machine.template.disks.0.size
+    eagerly_scrub    = data.vsphere_virtual_machine.template.disks.0.eagerly_scrub
+    thin_provisioned = data.vsphere_virtual_machine.template.disks.0.thin_provisioned
   }
 
   clone {
-    template_uuid = "${data.vsphere_virtual_machine.template.id}"
+    template_uuid = data.vsphere_virtual_machine.template.id
 
     customize {
       linux_options {
         host_name = "${var.vm_name}${count.index+1}"
-        domain    = "local.lan"
+        domain    = var.domain
       }
 
       network_interface {
@@ -97,9 +98,9 @@ resource "vsphere_virtual_machine" "vm" {
         ipv4_netmask = 24
       }
 
-      ipv4_gateway = "${var.ip_gateway}"
-      dns_server_list = "${var.dns_server_list}"
-      dns_suffix_list = "${var.dns_suffix_list}"
+      ipv4_gateway = var.ip_gateway
+      dns_server_list = var.dns_server_list
+      dns_suffix_list = var.dns_suffix_list
     }
   }
 
@@ -116,8 +117,8 @@ resource "vsphere_virtual_machine" "vm" {
       type        = "ssh"
       agent       = false
       host        = self.clone.0.customize.0.network_interface.0.ipv4_address
-      user        = "${data.vault_generic_secret.ssh_username.data["ssh_username"]}"
-      password    = "${data.vault_generic_secret.ssh_password.data["ssh_password"]}"
+      user        = data.vault_generic_secret.ssh_username.data["ssh_username"]
+      password    = data.vault_generic_secret.ssh_password.data["ssh_password"]
 
     }
 
@@ -132,8 +133,8 @@ resource "vsphere_virtual_machine" "vm" {
       type        = "ssh"
       agent       = false
       host        = self.clone.0.customize.0.network_interface.0.ipv4_address
-      user        = "${data.vault_generic_secret.ssh_username.data["ssh_username"]}"
-      password    = "${data.vault_generic_secret.ssh_password.data["ssh_password"]}"
+      user        = data.vault_generic_secret.ssh_username.data["ssh_username"]
+      password    = data.vault_generic_secret.ssh_password.data["ssh_password"]
 
     }
   }

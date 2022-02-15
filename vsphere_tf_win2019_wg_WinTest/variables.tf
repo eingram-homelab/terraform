@@ -9,7 +9,7 @@ variable "vsphere_password" {
 }
 
 variable "vsphere_server" {
-default = ""
+default = "vcsa.local.lan"
 }
 
 variable "vm_name" {
@@ -22,11 +22,11 @@ variable "vm_cpu" {
 }
 
 variable "vsphere_datacenter" {
-default = ""
+default = "HomeLab Datacenter"
 }
 
 variable "vsphere_compute_cluster" {
-default = ""
+default = "Intel NUC10 Cluster"
 }
 
 variable "vsphere_datastore" {
@@ -71,49 +71,49 @@ variable "vsphere_hardware_version" {
 
 }
 
-variable "ssh_username" {
-  default = ""
-  type = string
-  sensitive = true
-}
-variable "ssh_password" {
+variable "win_password" {
   default = ""
   type = string
   sensitive = true
 }
   
-variable "sub_email" {
-  default = ""
-  type = string
-  sensitive = true
-}
-
-variable "sub_password" {
-  default = ""
-  type = string
-  sensitive = true
-}
-
-variable "ip_address_list" {
-    type = list
-    default = []
+variable "ip_address" {
+    type = string
+    default = ""
 }
 
 variable "ip_gateway" {
-  type = string
+    type = string
+    default = ""
 }
 
 variable "dns_server_list" {
     type = list
-    default = []
+    default = ["192.168.1.250",
+    "192.168.1.251"]
 }
 
 variable "dns_suffix_list" {
     type = list
-    default = []
+    default = ["local.lan"]
 }
 
-variable "ansible_group" {
+variable "full_name" {
     type = string
-    default = ""
+    default = "Edward Ingram"
+}
+
+variable "organization_name" {
+    type = string
+    default = "HomeLab"
+}
+
+variable "time_zone" {
+    type = string
+    default = "004"
+}
+
+variable "workgroup" {
+    type = string
+    default = "workgroup"
 }
