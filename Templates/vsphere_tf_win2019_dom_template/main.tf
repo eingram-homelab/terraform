@@ -11,6 +11,12 @@ data "vault_generic_secret" "vsphere_password" {
 data "vault_generic_secret" "win_password" {
   path = "secret/win/administrator"
 }
+data "vault_generic_secret" "hladmin_username" {
+  path = "secret/win/homelab"
+}
+data "vault_generic_secret" "hladmin_password" {
+  path = "secret/win/homelab"
+}
 
 provider "vsphere" {
   user			= data.vault_generic_secret.vsphere_username.data["vsphere_username"]
@@ -87,15 +93,17 @@ resource "vsphere_virtual_machine" "vm" {
     customize {
       windows_options {
         computer_name = var.vm_name
-        workgroup    = var.workgroup
         admin_password = data.vault_generic_secret.win_password.data["win_password"]
         full_name       = var.full_name
         organization_name = var.organization_name
         auto_logon      = "true"
         time_zone       = var.time_zone
+        join_domain = var.domain
+        domain_admin_user = data.vault_generic_secret.hladmin_username.data["hladmin_username"]
+        domain_admin_password = data.vault_generic_secret.hladmin_password.data["hladmin_password"]
         # run_once_command_list = ""
       }
-      
+
       network_interface {
         ipv4_address = var.ip_address
         ipv4_netmask = 24
@@ -112,4 +120,31 @@ resource "vsphere_virtual_machine" "vm" {
   # }
 }
 
+# resource "null_resource" "vm" {
+#   triggers = {
+#     public_ip = vsphere_virtual_machine.vm.default_ip_address
+#   }
 
+#   connection {
+#     host = vsphere_virtual_machine.vm.default_ip_address
+#     timeout  = "3m"
+#     type     = "winrm"
+#     port     = 5985
+#     insecure = true
+#     https = false
+#     use_ntlm = true
+#     user     = data.vault_generic_secret.hladmin_username.data["hladmin_username"]
+#     password = data.vault_generic_secret.hladmin_password.data["hladmin_password"]
+#   }
+
+#   provisioner "file" {
+#     source      = "scripts/"
+#     destination = "C:/TEMP"    
+#   }
+
+#   provisioner "remote-exec" {
+#     inline = [
+#       "powershell -ExecutionPolicy Bypass -File C:\\temp\\InstallCCMclient.ps1"
+#       ]
+#   }
+# }

@@ -9,7 +9,7 @@ variable "vsphere_password" {
 }
 
 variable "vsphere_server" {
-default = "vcsa.local.lan"
+  default = "vcsa.local.lan"
 }
 
 variable "vm_name" {
@@ -22,53 +22,52 @@ variable "vm_cpu" {
 }
 
 variable "vsphere_datacenter" {
-default = "HomeLab Datacenter"
+  default = "HomeLab Datacenter"
 }
 
 variable "vsphere_compute_cluster" {
-default = "Intel NUC10 Cluster"
+  default = "Intel NUC10 Cluster"
 }
 
 variable "vsphere_datastore" {
-default = ""
+  default = ""
 }
 
 variable "vsphere_template" {
-    default = ""
+  default = ""
 }
 
 variable "vm_folder" {
-default = ""
+  default = ""
 }
 
 variable "esxi_hosts" {
-default = []
+  default = []
 }
  
 variable "network_interfaces" {
-description = "vmnics to be used" 
-default = []
+  description = "vmnics to be used" 
+  default = []
 }
 
 variable "vsphere_network" {
-default = ""
+  default = ""
 }
 
 variable "port_group_name" {
-default = ""
+  default = ""
 }
 
 variable "vsphere_dvs" {
   default = ""
-
 }
+
 variable "iso_path" {
   default = ""
 }
 
 variable "vsphere_hardware_version" {
   default = ""
-
 }
 
 variable "win_password" {
@@ -76,44 +75,55 @@ variable "win_password" {
   type = string
   sensitive = true
 }
+
+variable "hladmin_username" {
+  default = ""
+  type = string
+  sensitive = true
+}
+
+variable "hladmin_password" {
+  default = ""
+  type = string
+  sensitive = true
+}
   
 variable "ip_address" {
-    type = string
-    default = ""
+  type = string
+  default = ""
 }
 
 variable "ip_gateway" {
-    type = string
-    default = ""
+  type = string
+  default = ""
 }
 
 variable "dns_server_list" {
-    type = list
-    default = ["192.168.1.250",
-    "192.168.1.251"]
+  type = list
+  default = ["10.10.0.10"]
 }
 
 variable "dns_suffix_list" {
-    type = list
-    default = ["local.lan"]
+  type = list
+  default = ["homelab.local"]
 }
 
 variable "full_name" {
-    type = string
-    default = "Edward Ingram"
+  type = string
+  default = "Edward Ingram"
 }
 
 variable "organization_name" {
-    type = string
-    default = "HomeLab"
+  type = string
+  default = "HomeLab"
 }
 
 variable "time_zone" {
-    type = string
-    default = "004"
+  type = string
+  default = "004"
 }
 
-variable "workgroup" {
-    type = string
-    default = "workgroup"
+variable "domain" {
+  type = string
+  default = "homelab.local"
 }

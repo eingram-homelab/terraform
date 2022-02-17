@@ -60,8 +60,8 @@ variable "port_group_name" {
 
 variable "vsphere_dvs" {
   default = ""
-
 }
+
 variable "iso_path" {
   default = ""
 }
@@ -71,6 +71,18 @@ variable "vsphere_hardware_version" {
 }
 
 variable "win_password" {
+  default = ""
+  type = string
+  sensitive = true
+}
+
+variable "hladmin_username" {
+  default = ""
+  type = string
+  sensitive = true
+}
+
+variable "hladmin_password" {
   default = ""
   type = string
   sensitive = true
@@ -88,13 +100,12 @@ variable "ip_gateway" {
 
 variable "dns_server_list" {
   type = list
-  default = ["192.168.1.250",
-  "192.168.1.251"]
+  default = ["10.10.0.10"]
 }
 
 variable "dns_suffix_list" {
   type = list
-  default = ["local.lan"]
+  default = ["homelab.local"]
 }
 
 variable "full_name" {
@@ -112,7 +123,7 @@ variable "time_zone" {
   default = "004"
 }
 
-variable "workgroup" {
+variable "domain" {
   type = string
-  default = "workgroup"
+  default = "homelab.local"
 }
