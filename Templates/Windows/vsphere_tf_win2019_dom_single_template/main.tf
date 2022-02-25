@@ -114,37 +114,33 @@ resource "vsphere_virtual_machine" "vm" {
       dns_suffix_list = var.dns_suffix_list
     }
   }
-
-  # lifecycle {
-  #   prevent_destroy = true
-  # }
 }
 
-# resource "null_resource" "vm" {
-#   triggers = {
-#     public_ip = vsphere_virtual_machine.vm.default_ip_address
-#   }
+resource "null_resource" "vm" {
+  triggers = {
+    public_ip = vsphere_virtual_machine.vm.default_ip_address
+  }
 
-#   connection {
-#     host = vsphere_virtual_machine.vm.default_ip_address
-#     timeout  = "3m"
-#     type     = "winrm"
-#     port     = 5985
-#     insecure = true
-#     https = false
-#     use_ntlm = true
-#     user     = data.vault_generic_secret.hladmin_username.data["hladmin_username"]
-#     password = data.vault_generic_secret.hladmin_password.data["hladmin_password"]
-#   }
+  connection {
+    host = vsphere_virtual_machine.vm.default_ip_address
+    timeout  = "15m"
+    type     = "winrm"
+    port     = 5985
+    insecure = true
+    https = false
+    use_ntlm = true
+    user     = data.vault_generic_secret.hladmin_username.data["hladmin_username"]
+    password = data.vault_generic_secret.hladmin_password.data["hladmin_password"]
+  }
 
-#   provisioner "file" {
-#     source      = "scripts/"
-#     destination = "C:/TEMP"    
-#   }
-
-#   provisioner "remote-exec" {
-#     inline = [
-#       "powershell -ExecutionPolicy Bypass -File C:\\temp\\InstallCCMclient.ps1"
-#       ]
-#   }
-# }
+  provisioner "file" {
+    source       = "~/code/Terraform/files/powershell/config.ps1"
+    destination  = "c:/temp/config.ps1"
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "powershell -ExecutionPolicy Bypass -File c:\\temp\\config.ps1"
+      ]
+  }
+}
+  

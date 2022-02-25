@@ -1,0 +1,3 @@
+Set-NetConnectionProfile -InterfaceAlias Ethernet0 -NetworkCategory "Private"
+Get-NetFirewallRule -DisplayGroup 'Network Discovery'|Set-NetFirewallRule -Profile 'Private, Domain' -Enabled true
+Get-Disk | Where partitionstyle -eq 'raw' |Initialize-Disk -PartitionStyle MBR -PassThru |New-Partition -AssignDriveLetter -UseMaximumSize |Format-Volume -FileSystem NTFS -NewFileSystemLabel 'Programs' -Confirm:$false

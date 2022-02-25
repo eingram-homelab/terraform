@@ -13,6 +13,7 @@ variable "vsphere_server" {
 }
 
 variable "vm_name" {
+  type = list
 }
 
 variable "vm_ram" {
@@ -30,7 +31,7 @@ variable "vsphere_compute_cluster" {
 }
 
 variable "vsphere_datastore" {
-  default = ""
+  type = list
 }
 
 variable "vsphere_template" {
@@ -38,7 +39,6 @@ variable "vsphere_template" {
 }
 
 variable "vm_folder" {
-  default = ""
 }
 
 variable "esxi_hosts" {
@@ -51,7 +51,7 @@ variable "network_interfaces" {
 }
 
 variable "vsphere_network" {
-  default = ""
+  type = list
 }
 
 variable "port_group_name" {
@@ -89,13 +89,13 @@ variable "hladmin_password" {
 }
   
 variable "ip_address" {
-  type = string
-  default = ""
+  type = list
+  default = []
 }
 
 variable "ip_gateway" {
-  type = string
-  default = ""
+  type = list
+  default = []
 }
 
 variable "dns_server_list" {
