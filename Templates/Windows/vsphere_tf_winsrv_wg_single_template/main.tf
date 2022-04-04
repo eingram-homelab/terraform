@@ -1,3 +1,5 @@
+# Deploy RHEL8.5 VMs
+
 provider "vault" {
 }
 data "vault_generic_secret" "vsphere_username" {
@@ -8,12 +10,6 @@ data "vault_generic_secret" "vsphere_password" {
 }
 data "vault_generic_secret" "win_password" {
   path = "secret/win/administrator"
-}
-data "vault_generic_secret" "hladmin_username" {
-  path = "secret/win/homelab"
-}
-data "vault_generic_secret" "hladmin_password" {
-  path = "secret/win/homelab"
 }
 
 provider "vsphere" {
@@ -28,8 +24,7 @@ data "vsphere_datacenter" "dc" {
 }
 
 data "vsphere_datastore" "datastore" {
-  count         = length(var.vsphere_datastore)
-  name          = element(var.vsphere_datastore, count.index)
+  name          = var.vsphere_datastore
   datacenter_id = data.vsphere_datacenter.dc.id
 }
 
@@ -39,8 +34,7 @@ data "vsphere_compute_cluster" "cluster" {
 }
 
 data "vsphere_network" "network" {
-  count         = length(var.vsphere_network)
-  name          = element(var.vsphere_network, count.index)
+  name          = var.vsphere_network
   datacenter_id = data.vsphere_datacenter.dc.id
 }
 
@@ -56,22 +50,22 @@ resource "vsphere_folder" "folder" {
 }
 
 resource "vsphere_virtual_machine" "vm" {
-  count            = length(var.vm_name)
-  # name             = var.vm_name
-  name             = element(var.vm_name, count.index)
+  # count            = 1
+  name             = var.vm_name
   resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
-  datastore_id     = data.vsphere_datastore.datastore[count.index].id
+  datastore_id     = data.vsphere_datastore.datastore.id
   folder           = var.vm_folder
   firmware         = "efi"
 
   num_cpus = var.vm_cpu
   memory   = var.vm_ram
+  memory_reservation = var.vm_ram
   guest_id = data.vsphere_virtual_machine.template.guest_id
 
   scsi_type = data.vsphere_virtual_machine.template.scsi_type
 
   network_interface {
-    network_id   = data.vsphere_network.network[count.index].id
+    network_id   = data.vsphere_network.network.id
     adapter_type = data.vsphere_virtual_machine.template.network_interface_types[0]
   }
 
@@ -93,61 +87,55 @@ resource "vsphere_virtual_machine" "vm" {
 
     customize {
       windows_options {
-        computer_name = element(var.vm_name, count.index)
+        computer_name = var.vm_name
+        workgroup    = var.workgroup
         admin_password = data.vault_generic_secret.win_password.data["win_password"]
         full_name       = var.full_name
         organization_name = var.organization_name
         auto_logon      = "true"
         time_zone       = var.time_zone
-        join_domain = var.domain
-        domain_admin_user = data.vault_generic_secret.hladmin_username.data["hladmin_username"]
-        domain_admin_password = data.vault_generic_secret.hladmin_password.data["hladmin_password"]
         # run_once_command_list = ""
       }
 
       network_interface {
-        ipv4_address = element(var.ip_address, count.index)
+        ipv4_address = var.ip_address
         ipv4_netmask = 24
       }
 
-      ipv4_gateway = element(var.ip_gateway, count.index)
+      ipv4_gateway = var.ip_gateway
       dns_server_list = var.dns_server_list
       dns_suffix_list = var.dns_suffix_list
     }
+  }
+} 
+
+resource "null_resource" "vm" {
+  triggers = {
+    public_ip = vsphere_virtual_machine.vm.default_ip_address
+  }
+
+  connection {
+    host = vsphere_virtual_machine.vm.default_ip_address
+    timeout  = "15m"
+    type     = "winrm"
+    port     = 5985
+    insecure = true
+    https = false
+    # use_ntlm = true
+    user     = "administrator"
+    password = data.vault_generic_secret.win_password.data["win_password"]
   }
 
   provisioner "file" {
     source       = "~/code/Terraform/files/powershell/config.ps1"
     destination  = "c:/temp/config.ps1"
-
-    connection {
-      host = self.clone.0.customize.0.network_interface.0.ipv4_address
-      timeout  = "3m"
-      type     = "winrm"
-      port     = 5985
-      insecure = true
-      https = false
-      use_ntlm = true
-      user     = data.vault_generic_secret.hladmin_username.data["hladmin_username"]
-      password = data.vault_generic_secret.hladmin_password.data["hladmin_password"]
-    }
   }
-
   provisioner "remote-exec" {
     inline = [
       "powershell -ExecutionPolicy Bypass -File c:\\temp\\config.ps1"
       ]
-      
-    connection {
-      host = self.clone.0.customize.0.network_interface.0.ipv4_address
-      timeout  = "3m"
-      type     = "winrm"
-      port     = 5985
-      insecure = true
-      https = false
-      use_ntlm = true
-      user     = data.vault_generic_secret.hladmin_username.data["hladmin_username"]
-      password = data.vault_generic_secret.hladmin_password.data["hladmin_password"]
-    }
   }
 }
+ 
+
+

@@ -1,4 +1,4 @@
-# Deploy RHEL8.5 VMs
+ # Deploy RHEL8.5 VMs
 
 provider "vault" {
 }
@@ -8,8 +8,17 @@ data "vault_generic_secret" "vsphere_username" {
 data "vault_generic_secret" "vsphere_password" {
   path = "secret/vsphere/vcsa"
 }
-data "vault_generic_secret" "win_password" {
-  path = "secret/win/administrator"
+data "vault_generic_secret" "ssh_username" {
+  path = "secret/ssh/eingram"
+}
+data "vault_generic_secret" "ssh_password" {
+  path = "secret/ssh/eingram"
+}
+data "vault_generic_secret" "sub_email" {
+  path = "secret/rhel/dev"
+}
+data "vault_generic_secret" "sub_password" {
+  path = "secret/rhel/dev"
 }
 
 provider "vsphere" {
@@ -50,15 +59,16 @@ resource "vsphere_folder" "folder" {
 }
 
 resource "vsphere_virtual_machine" "vm" {
-  # count            = 1
-  name             = var.vm_name
+  count            = length(var.ip_address_list)
+  name             = "${var.vm_name}${count.index+1}"
   resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
   datastore_id     = data.vsphere_datastore.datastore.id
   folder           = var.vm_folder
-  firmware         = "efi"
+  firmware = "efi"
 
   num_cpus = var.vm_cpu
   memory   = var.vm_ram
+  memory_reservation = var.vm_ram
   guest_id = data.vsphere_virtual_machine.template.guest_id
 
   scsi_type = data.vsphere_virtual_machine.template.scsi_type
@@ -75,29 +85,17 @@ resource "vsphere_virtual_machine" "vm" {
     thin_provisioned = data.vsphere_virtual_machine.template.disks.0.thin_provisioned
   }
 
-  disk {
-    label            = "disk1"
-    size             = "40"
-    unit_number      = 1
-  }
-
   clone {
     template_uuid = data.vsphere_virtual_machine.template.id
 
     customize {
-      windows_options {
-        computer_name = var.vm_name
-        workgroup    = var.workgroup
-        admin_password = data.vault_generic_secret.win_password.data["win_password"]
-        full_name       = var.full_name
-        organization_name = var.organization_name
-        auto_logon      = "true"
-        time_zone       = var.time_zone
-        # run_once_command_list = ""
+      linux_options {
+        host_name = "${var.vm_name}${count.index+1}"
+        domain    = var.domain
       }
 
       network_interface {
-        ipv4_address = var.ip_address
+        ipv4_address = element(var.ip_address_list, count.index)
         ipv4_netmask = 24
       }
 
@@ -106,35 +104,46 @@ resource "vsphere_virtual_machine" "vm" {
       dns_suffix_list = var.dns_suffix_list
     }
   }
-} 
 
-resource "null_resource" "vm" {
-  triggers = {
-    public_ip = vsphere_virtual_machine.vm.default_ip_address
-  }
-
-  connection {
-    host = vsphere_virtual_machine.vm.default_ip_address
-    timeout  = "15m"
-    type     = "winrm"
-    port     = 5985
-    insecure = true
-    https = false
-    # use_ntlm = true
-    user     = "administrator"
-    password = data.vault_generic_secret.win_password.data["win_password"]
-  }
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
 
   provisioner "file" {
-    source       = "~/code/Terraform/files/powershell/config.ps1"
-    destination  = "c:/temp/config.ps1"
+    source       = "~/code/Terraform/files/bash/post_script.sh"
+    destination  = "/home/eingram/post_script.sh"
   }
+
+    connection {
+      type        = "ssh"
+      agent       = false
+      host        = self.clone.0.customize.0.network_interface.0.ipv4_address
+      user        = data.vault_generic_secret.ssh_username.data["ssh_username"]
+      password    = data.vault_generic_secret.ssh_password.data["ssh_password"]
+
+    }
+
   provisioner "remote-exec" {
     inline = [
-      "powershell -ExecutionPolicy Bypass -File c:\\temp\\config.ps1"
-      ]
+      "echo ${data.vault_generic_secret.ssh_password.data["ssh_password"]} | sudo -S subscription-manager register --force --username ${data.vault_generic_secret.sub_email.data["sub_email"]} --password ${data.vault_generic_secret.sub_password.data["sub_password"]} --auto-attach",
+      "chmod +x /home/eingram/post_script.sh",
+      "echo ${data.vault_generic_secret.ssh_password.data["ssh_password"]} | sudo -S /home/eingram/post_script.sh"
+    ]
+
+    connection {
+      type        = "ssh"
+      agent       = false
+      host        = self.clone.0.customize.0.network_interface.0.ipv4_address
+      user        = data.vault_generic_secret.ssh_username.data["ssh_username"]
+      password    = data.vault_generic_secret.ssh_password.data["ssh_password"]
+
+    }
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      ansible-playbook ../../Ansible/playbooks/terraform/tf_deploy_new_server.yaml --extra-vars "group=${var.ansible_group} newhost=${var.vm_name}${count.index+1}.local.lan newip=${element(var.ip_address_list, count.index)}"
+    EOT
   }
 }
- 
-
 

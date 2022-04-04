@@ -65,6 +65,7 @@ resource "vsphere_virtual_machine" "vm" {
 
   num_cpus = var.vm_cpu
   memory   = var.vm_ram
+  memory_reservation = var.vm_ram
   guest_id = data.vsphere_virtual_machine.template.guest_id
 
   scsi_type = data.vsphere_virtual_machine.template.scsi_type
@@ -122,7 +123,7 @@ resource "null_resource" "vm" {
   }
 
   connection {
-    host = vsphere_virtual_machine.vm.default_ip_address
+    host = vsphere_virtual_machine.vm.default_ip_address[count.index].id
     timeout  = "15m"
     type     = "winrm"
     port     = 5985

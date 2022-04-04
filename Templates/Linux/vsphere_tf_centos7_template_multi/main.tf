@@ -61,6 +61,7 @@ resource "vsphere_virtual_machine" "vm" {
 
   num_cpus = var.vm_cpu
   memory   = var.vm_ram
+  memory_reservation = var.vm_ram
   guest_id = data.vsphere_virtual_machine.template.guest_id
   scsi_type = data.vsphere_virtual_machine.template.scsi_type
 
@@ -101,7 +102,7 @@ resource "vsphere_virtual_machine" "vm" {
   # }
 
   provisioner "file" {
-    source       = "~/code/Terraform/files/post_script.sh"
+    source       = "~/code/Terraform/files/bash/post_script.sh"
     destination  = "/home/eingram/post_script.sh"
   }
 

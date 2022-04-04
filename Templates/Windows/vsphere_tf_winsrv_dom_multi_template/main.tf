@@ -68,6 +68,7 @@ resource "vsphere_virtual_machine" "vm" {
 
   num_cpus = var.vm_cpu
   memory   = var.vm_ram
+  memory_reservation = var.vm_ram
   guest_id = data.vsphere_virtual_machine.template.guest_id
 
   scsi_type = data.vsphere_virtual_machine.template.scsi_type
@@ -117,22 +118,30 @@ resource "vsphere_virtual_machine" "vm" {
       dns_suffix_list = var.dns_suffix_list
     }
   }
+}
+
+resource "null_resource" "vm" {
+  triggers = {
+    ip = join(",", vsphere_virtual_machine.vm.*.default_ip_address)
+  }
+  count = length(var.vm_name)
+
+  connection {
+    # host = self.clone.0.customize.0.network_interface.0.ipv4_address
+    host = element(var.ip_address, count.index)
+    timeout  = "15m"
+    type     = "winrm"
+    port     = 5985
+    insecure = true
+    https = false
+    use_ntlm = true
+    user     = data.vault_generic_secret.hladmin_username.data["hladmin_username"]
+    password = data.vault_generic_secret.hladmin_password.data["hladmin_password"]
+  }
 
   provisioner "file" {
-    source       = "~/code/Terraform/files/powershell/config.ps1"
-    destination  = "c:/temp/config.ps1"
-
-    connection {
-      host = self.clone.0.customize.0.network_interface.0.ipv4_address
-      timeout  = "3m"
-      type     = "winrm"
-      port     = 5985
-      insecure = true
-      https = false
-      use_ntlm = true
-      user     = data.vault_generic_secret.hladmin_username.data["hladmin_username"]
-      password = data.vault_generic_secret.hladmin_password.data["hladmin_password"]
-    }
+    source       = "~/code/Terraform/files/powershell/"
+    destination  = "c:/temp"
   }
 
   provisioner "remote-exec" {
@@ -140,16 +149,16 @@ resource "vsphere_virtual_machine" "vm" {
       "powershell -ExecutionPolicy Bypass -File c:\\temp\\config.ps1"
       ]
       
-    connection {
-      host = self.clone.0.customize.0.network_interface.0.ipv4_address
-      timeout  = "3m"
-      type     = "winrm"
-      port     = 5985
-      insecure = true
-      https = false
-      use_ntlm = true
-      user     = data.vault_generic_secret.hladmin_username.data["hladmin_username"]
-      password = data.vault_generic_secret.hladmin_password.data["hladmin_password"]
-    }
+    # connection {
+    #   host = self.clone.0.customize.0.network_interface.0.ipv4_address
+    #   timeout  = "3m"
+    #   type     = "winrm"
+    #   port     = 5985
+    #   insecure = true
+    #   https = false
+    #   use_ntlm = true
+    #   user     = data.vault_generic_secret.hladmin_username.data["hladmin_username"]
+    #   password = data.vault_generic_secret.hladmin_password.data["hladmin_password"]
+    # }
   }
 }
