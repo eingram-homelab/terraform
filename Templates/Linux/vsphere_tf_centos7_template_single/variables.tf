@@ -1,10 +1,10 @@
 variable "vsphere_username" {
-  default = ""
+  default   = ""
   sensitive = true
 }
 
 variable "vsphere_password" {
-  default = ""
+  default   = ""
   sensitive = true
 }
 
@@ -48,10 +48,10 @@ variable "vm_folder" {
 variable "esxi_hosts" {
   default = []
 }
- 
+
 variable "network_interfaces" {
-  description = "vmnics to be used" 
-  default = []
+  description = "vmnics to be used"
+  default     = []
 }
 
 variable "vsphere_network" {
@@ -75,34 +75,34 @@ variable "vsphere_hardware_version" {
 }
 
 variable "ssh_username" {
-  default = ""
-  type = string
+  default   = ""
+  type      = string
   sensitive = true
 }
 
 variable "ssh_password" {
-  default = ""
-  type = string
+  default   = ""
+  type      = string
   sensitive = true
 }
-  
+
 variable "ip_address" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "dns_server_list" {
-  type = list
+  type = list(any)
   default = ["192.168.1.250",
   "192.168.1.251"]
 }
 
 variable "dns_suffix_list" {
-  type = list
+  type    = list(any)
   default = ["local.lan"]
 }
 
 variable "ansible_group" {
-  type = string
+  type    = string
   default = ""
 }

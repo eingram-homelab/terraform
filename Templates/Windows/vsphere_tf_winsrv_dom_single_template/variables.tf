@@ -1,10 +1,10 @@
 variable "vsphere_username" {
-  default = ""
+  default   = ""
   sensitive = true
 }
 
 variable "vsphere_password" {
-  default = ""
+  default   = ""
   sensitive = true
 }
 
@@ -44,10 +44,10 @@ variable "vm_folder" {
 variable "esxi_hosts" {
   default = []
 }
- 
+
 variable "network_interfaces" {
-  description = "vmnics to be used" 
-  default = []
+  description = "vmnics to be used"
+  default     = []
 }
 
 variable "vsphere_network" {
@@ -71,59 +71,59 @@ variable "vsphere_hardware_version" {
 }
 
 variable "win_password" {
-  default = ""
-  type = string
+  default   = ""
+  type      = string
   sensitive = true
 }
 
 variable "hladmin_username" {
-  default = ""
-  type = string
+  default   = ""
+  type      = string
   sensitive = true
 }
 
 variable "hladmin_password" {
-  default = ""
-  type = string
+  default   = ""
+  type      = string
   sensitive = true
 }
-  
+
 variable "ip_address" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "ip_gateway" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "dns_server_list" {
-  type = list
+  type    = list(any)
   default = ["10.10.0.10"]
 }
 
 variable "dns_suffix_list" {
-  type = list
+  type    = list(any)
   default = ["homelab.local"]
 }
 
 variable "full_name" {
-  type = string
+  type    = string
   default = "Edward Ingram"
 }
 
 variable "organization_name" {
-  type = string
+  type    = string
   default = "HomeLab"
 }
 
 variable "time_zone" {
-  type = string
+  type    = string
   default = "004"
 }
 
 variable "domain" {
-  type = string
+  type    = string
   default = "homelab.local"
 }

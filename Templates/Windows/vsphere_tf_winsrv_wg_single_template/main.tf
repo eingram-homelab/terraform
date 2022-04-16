@@ -13,10 +13,10 @@ data "vault_generic_secret" "win_password" {
 }
 
 provider "vsphere" {
-  user			= data.vault_generic_secret.vsphere_username.data["vsphere_username"]
-  password		= data.vault_generic_secret.vsphere_password.data["vsphere_password"]
-  vsphere_server 	= var.vsphere_server
-  allow_unverified_ssl	= true
+  user                 = data.vault_generic_secret.vsphere_username.data["vsphere_username"]
+  password             = data.vault_generic_secret.vsphere_password.data["vsphere_password"]
+  vsphere_server       = var.vsphere_server
+  allow_unverified_ssl = true
 }
 
 data "vsphere_datacenter" "dc" {
@@ -44,9 +44,9 @@ data "vsphere_virtual_machine" "template" {
 }
 
 resource "vsphere_folder" "folder" {
-  path             = var.vm_folder
-  type             = "vm"
-  datacenter_id    = data.vsphere_datacenter.dc.id
+  path          = var.vm_folder
+  type          = "vm"
+  datacenter_id = data.vsphere_datacenter.dc.id
 }
 
 resource "vsphere_virtual_machine" "vm" {
@@ -57,10 +57,10 @@ resource "vsphere_virtual_machine" "vm" {
   folder           = var.vm_folder
   firmware         = "efi"
 
-  num_cpus = var.vm_cpu
-  memory   = var.vm_ram
+  num_cpus           = var.vm_cpu
+  memory             = var.vm_ram
   memory_reservation = var.vm_ram
-  guest_id = data.vsphere_virtual_machine.template.guest_id
+  guest_id           = data.vsphere_virtual_machine.template.guest_id
 
   scsi_type = data.vsphere_virtual_machine.template.scsi_type
 
@@ -77,9 +77,9 @@ resource "vsphere_virtual_machine" "vm" {
   }
 
   disk {
-    label            = "disk1"
-    size             = "40"
-    unit_number      = 1
+    label       = "disk1"
+    size        = "40"
+    unit_number = 1
   }
 
   clone {
@@ -87,13 +87,13 @@ resource "vsphere_virtual_machine" "vm" {
 
     customize {
       windows_options {
-        computer_name = var.vm_name
-        workgroup    = var.workgroup
-        admin_password = data.vault_generic_secret.win_password.data["win_password"]
-        full_name       = var.full_name
+        computer_name     = var.vm_name
+        workgroup         = var.workgroup
+        admin_password    = data.vault_generic_secret.win_password.data["win_password"]
+        full_name         = var.full_name
         organization_name = var.organization_name
-        auto_logon      = "true"
-        time_zone       = var.time_zone
+        auto_logon        = "true"
+        time_zone         = var.time_zone
         # run_once_command_list = ""
       }
 
@@ -102,12 +102,12 @@ resource "vsphere_virtual_machine" "vm" {
         ipv4_netmask = 24
       }
 
-      ipv4_gateway = var.ip_gateway
+      ipv4_gateway    = var.ip_gateway
       dns_server_list = var.dns_server_list
       dns_suffix_list = var.dns_suffix_list
     }
   }
-} 
+}
 
 resource "null_resource" "vm" {
   triggers = {
@@ -115,27 +115,27 @@ resource "null_resource" "vm" {
   }
 
   connection {
-    host = vsphere_virtual_machine.vm.default_ip_address
+    host     = vsphere_virtual_machine.vm.default_ip_address
     timeout  = "15m"
     type     = "winrm"
     port     = 5985
     insecure = true
-    https = false
+    https    = false
     # use_ntlm = true
     user     = "administrator"
     password = data.vault_generic_secret.win_password.data["win_password"]
   }
 
   provisioner "file" {
-    source       = "~/code/Terraform/files/powershell/config.ps1"
-    destination  = "c:/temp/config.ps1"
+    source      = "~/code/Terraform/files/powershell/config.ps1"
+    destination = "c:/temp/config.ps1"
   }
   provisioner "remote-exec" {
     inline = [
       "powershell -ExecutionPolicy Bypass -File c:\\temp\\config.ps1"
-      ]
+    ]
   }
 }
- 
+
 
 

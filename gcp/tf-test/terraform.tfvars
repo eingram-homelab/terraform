@@ -1,0 +1,7 @@
+project = "tf-test-347000"
+# region  = "us-west1"
+# zone    = "us-west1-c"
+vpc_name     = "terraform-network"
+vm_name      = "terraform-instance"
+machine_type = "f1-micro"
+image        = "debian-cloud/debian-9"

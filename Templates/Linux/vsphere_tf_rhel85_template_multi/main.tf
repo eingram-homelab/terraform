@@ -1,4 +1,4 @@
- # Deploy RHEL8.5 VMs
+# Deploy RHEL8.5 VMs
 
 provider "vault" {
 }
@@ -22,10 +22,10 @@ data "vault_generic_secret" "sub_password" {
 }
 
 provider "vsphere" {
-  user			= data.vault_generic_secret.vsphere_username.data["vsphere_username"]
-  password		= data.vault_generic_secret.vsphere_password.data["vsphere_password"]
-  vsphere_server 	= var.vsphere_server
-  allow_unverified_ssl	= true
+  user                 = data.vault_generic_secret.vsphere_username.data["vsphere_username"]
+  password             = data.vault_generic_secret.vsphere_password.data["vsphere_password"]
+  vsphere_server       = var.vsphere_server
+  allow_unverified_ssl = true
 }
 
 data "vsphere_datacenter" "dc" {
@@ -53,23 +53,23 @@ data "vsphere_virtual_machine" "template" {
 }
 
 resource "vsphere_folder" "folder" {
-  path             = var.vm_folder
-  type             = "vm"
-  datacenter_id    = data.vsphere_datacenter.dc.id
+  path          = var.vm_folder
+  type          = "vm"
+  datacenter_id = data.vsphere_datacenter.dc.id
 }
 
 resource "vsphere_virtual_machine" "vm" {
   count            = length(var.ip_address_list)
-  name             = "${var.vm_name}${count.index+1}"
+  name             = "${var.vm_name}${count.index + 1}"
   resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
   datastore_id     = data.vsphere_datastore.datastore.id
   folder           = var.vm_folder
-  firmware = "efi"
+  firmware         = "efi"
 
-  num_cpus = var.vm_cpu
-  memory   = var.vm_ram
+  num_cpus           = var.vm_cpu
+  memory             = var.vm_ram
   memory_reservation = var.vm_ram
-  guest_id = data.vsphere_virtual_machine.template.guest_id
+  guest_id           = data.vsphere_virtual_machine.template.guest_id
 
   scsi_type = data.vsphere_virtual_machine.template.scsi_type
 
@@ -90,7 +90,7 @@ resource "vsphere_virtual_machine" "vm" {
 
     customize {
       linux_options {
-        host_name = "${var.vm_name}${count.index+1}"
+        host_name = "${var.vm_name}${count.index + 1}"
         domain    = var.domain
       }
 
@@ -99,7 +99,7 @@ resource "vsphere_virtual_machine" "vm" {
         ipv4_netmask = 24
       }
 
-      ipv4_gateway = var.ip_gateway
+      ipv4_gateway    = var.ip_gateway
       dns_server_list = var.dns_server_list
       dns_suffix_list = var.dns_suffix_list
     }
@@ -110,18 +110,18 @@ resource "vsphere_virtual_machine" "vm" {
   # }
 
   provisioner "file" {
-    source       = "~/code/Terraform/files/bash/post_script.sh"
-    destination  = "/home/eingram/post_script.sh"
+    source      = "~/code/Terraform/files/bash/post_script.sh"
+    destination = "/home/eingram/post_script.sh"
   }
 
-    connection {
-      type        = "ssh"
-      agent       = false
-      host        = self.clone.0.customize.0.network_interface.0.ipv4_address
-      user        = data.vault_generic_secret.ssh_username.data["ssh_username"]
-      password    = data.vault_generic_secret.ssh_password.data["ssh_password"]
+  connection {
+    type     = "ssh"
+    agent    = false
+    host     = self.clone.0.customize.0.network_interface.0.ipv4_address
+    user     = data.vault_generic_secret.ssh_username.data["ssh_username"]
+    password = data.vault_generic_secret.ssh_password.data["ssh_password"]
 
-    }
+  }
 
   provisioner "remote-exec" {
     inline = [
@@ -131,18 +131,18 @@ resource "vsphere_virtual_machine" "vm" {
     ]
 
     connection {
-      type        = "ssh"
-      agent       = false
-      host        = self.clone.0.customize.0.network_interface.0.ipv4_address
-      user        = data.vault_generic_secret.ssh_username.data["ssh_username"]
-      password    = data.vault_generic_secret.ssh_password.data["ssh_password"]
+      type     = "ssh"
+      agent    = false
+      host     = self.clone.0.customize.0.network_interface.0.ipv4_address
+      user     = data.vault_generic_secret.ssh_username.data["ssh_username"]
+      password = data.vault_generic_secret.ssh_password.data["ssh_password"]
 
     }
   }
 
   provisioner "local-exec" {
     command = <<-EOT
-      ansible-playbook ../../Ansible/playbooks/terraform/tf_deploy_new_server.yaml --extra-vars "group=${var.ansible_group} newhost=${var.vm_name}${count.index+1}.local.lan newip=${element(var.ip_address_list, count.index)}"
+      ansible-playbook ../../Ansible/playbooks/terraform/tf_deploy_new_server.yaml --extra-vars "group=${var.ansible_group} newhost=${var.vm_name}${count.index + 1}.local.lan newip=${element(var.ip_address_list, count.index)}"
     EOT
   }
 }
