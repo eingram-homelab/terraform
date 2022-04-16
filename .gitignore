@@ -4,6 +4,8 @@
 # .tfstate files
 *.tfstate
 *.tfstate.*
+*.json
+.DS_Store
 
 # Crash log files
 crash.log
