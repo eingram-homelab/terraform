@@ -1,7 +1,7 @@
 variable "project" {}
 
 variable "credentials_file" {
-  default = "tf-test-347000-ac0f18940ce4.json"
+  default = "tf-test-347000-3ca8fbe22dbb.json"
 }
 
 variable "region" {
@@ -19,3 +19,11 @@ variable "vpc_name" {}
 variable "machine_type" {}
 
 variable "image" {}
+
+variable "ip_subnet" {}
+
+variable "subnet_name" {}
+
+variable "vm_count" {}
+
+variable "project_service" {}
