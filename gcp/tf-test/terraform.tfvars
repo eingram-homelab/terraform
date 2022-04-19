@@ -10,9 +10,9 @@ ip_subnet = "10.30.0.0/24"
 
 vm_count = 2
 
-project_service = [
-  "cloudresourcemanager.googleapis.com",
-  "iam.googleapis.com",
-  "compute.googleapis.com",
-  "oslogin.googleapis.com"
-]
+# project_service = [
+#   "cloudresourcemanager.googleapis.com",
+#   "iam.googleapis.com",
+#   "compute.googleapis.com",
+#   "oslogin.googleapis.com"
+# ]
