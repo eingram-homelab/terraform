@@ -102,7 +102,7 @@ resource "vsphere_virtual_machine" "vm" {
   # }
 
   provisioner "file" {
-    source      = "~/code/Terraform/files/bash/post_script.sh"
+    source      = "~/code/Terraform/files/shell/post_script.sh"
     destination = "/home/eingram/post_script.sh"
   }
 
