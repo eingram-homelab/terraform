@@ -1,0 +1,42 @@
+---
+
+# DO NOT RUN MANUALLY - MEANT TO BE RUN FROM TERRAFORM
+
+- name: Remove host from Ansible inventory
+  hosts: localhost
+  gather_facts: no
+  connection: local
+  become: false
+
+  tasks:
+    - name: Remove inventory entry
+      lineinfile:
+        backup: yes
+        path: ~/code/Ansible/hosts
+        line: "{{ newhost }}"
+        state: absent
+
+    - meta: refresh_inventory
+    
+- name: Remove host record to piholes
+  hosts: pihole
+  gather_facts: no
+  remote_user: eingram
+  become: yes
+  become_method: sudo
+
+  tasks:
+
+    - name: Remove DNS record
+      lineinfile:
+        backup: yes
+        path: /etc/pihole/custom.list
+        regexp: "{{ newhost }}$"
+        state: absent
+      register: dnsremoved
+
+    - name: Restart pihole-FTL
+      service:
+        name: pihole-FTL
+        state: restarted
+      when: dnsremoved.changed
