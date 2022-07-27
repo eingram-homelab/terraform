@@ -122,4 +122,4 @@ variable "time_zone" {
 
 variable "domain" {}
 
-variable "proj_name" {}
+variable "vm_folder_name" {}

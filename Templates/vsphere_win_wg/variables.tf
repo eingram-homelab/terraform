@@ -110,4 +110,4 @@ variable "time_zone" {
 
 variable "workgroup" {}
 
-variable "proj_name" {}
+variable "vm_folder_name" {}

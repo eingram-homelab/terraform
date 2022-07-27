@@ -42,7 +42,7 @@ variable "vsphere_template" {
   default = ""
 }
 
-variable "proj_name" {
+variable "vm_folder_name" {
   default = ""
 }
 

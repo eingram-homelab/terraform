@@ -52,7 +52,7 @@ data "vsphere_virtual_machine" "template" {
 }
 
 resource "vsphere_folder" "folder" {
-  path          = var.proj_name
+  path          = var.vm_folder_name
   type          = "vm"
   datacenter_id = data.vsphere_datacenter.dc.id
 }
@@ -68,7 +68,7 @@ resource "vsphere_virtual_machine" "vm" {
 
   resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
   datastore_id     = data.vsphere_datastore.datastore[count.index].id
-  folder           = var.proj_name
+  folder           = var.vm_folder_name
   firmware         = "efi"
 
   num_cpus           = var.vm_cpu
