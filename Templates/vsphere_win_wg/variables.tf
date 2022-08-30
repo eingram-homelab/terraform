@@ -88,10 +88,7 @@ variable "dns_server_list" {
   default = ["10.10.0.10"]
 }
 
-variable "dns_suffix_list" {
-  type    = list(any)
-  default = ["homelab.local"]
-}
+variable "dns_domain" {}
 
 variable "full_name" {
   type    = string

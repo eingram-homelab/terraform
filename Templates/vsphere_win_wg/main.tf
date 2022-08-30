@@ -45,17 +45,11 @@ data "vsphere_virtual_machine" "template" {
   datacenter_id = data.vsphere_datacenter.dc.id
 }
 
-resource "vsphere_folder" "folder" {
-  path          = var.vm_folder_name
-  type          = "vm"
-  datacenter_id = data.vsphere_datacenter.dc.id
+data "vsphere_folder" "folder" {
+  path          = "/HomeLab Datacenter/vm/WindowsWG"
 }
 
 resource "vsphere_virtual_machine" "vm" {
-
-    depends_on = [
-    resource.vsphere_folder.folder
-  ]
 
   count = length(var.vm_name_list)
   name  = element(var.vm_name_list, count.index)
@@ -108,11 +102,12 @@ resource "vsphere_virtual_machine" "vm" {
       network_interface {
         ipv4_address = element(var.ip_address_list, count.index)
         ipv4_netmask = 24
+        dns_domain = var.dns_domain
+        # dns_domain = element(var.dns_suffix_list, count.index)
       }
 
       ipv4_gateway    = element(var.ip_gateway_list, count.index)
       dns_server_list = var.dns_server_list
-      dns_suffix_list = var.dns_suffix_list
     }
   }
 
@@ -165,7 +160,8 @@ resource "null_resource" "vm" {
 
   provisioner "remote-exec" {
     inline = [
-      "powershell -ExecutionPolicy Bypass -File c:\\temp\\config.ps1"
+      "powershell -ExecutionPolicy Bypass -File c:\\temp\\config.ps1",
+      "powershell -command Set-ItemProperty -Path HKLM:\\System\\CurrentControlSet\\Services\\Tcpip\\Parameters -Name Domain -Value local.lan"
     ]
 
     # connection {

@@ -1,4 +1,4 @@
-project      = "yc-srv1-proj"
+gcp_project      = "yc-srv1-proj"
 vm_name      = "yc-srv1"
 machine_type = "e2-small"
 image        = "rocky-linux-cloud/rocky-linux-8"

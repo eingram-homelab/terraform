@@ -9,10 +9,9 @@ terraform {
 
 provider "google" {
   credentials = file(var.credentials_file)
-
-  project = var.project
-  region  = var.region
-  zone    = var.zone
+  project = var.gcp_project
+  region  = var.gcp_region
+  zone    = var.gcp_zone
 }
 
 # resource "google_project_service" "project" {

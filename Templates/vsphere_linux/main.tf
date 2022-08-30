@@ -53,10 +53,6 @@ data "vsphere_folder" "folder" {
 }
 
 resource "vsphere_virtual_machine" "vm" {
-
-  # depends_on = [
-  #   resource.vsphere_folder.folder
-  # ]
   
   count = length(var.vm_name_list)
   name  = element(var.vm_name_list, count.index)
@@ -91,7 +87,7 @@ resource "vsphere_virtual_machine" "vm" {
     customize {
       linux_options {
         host_name = element(var.vm_name_list, count.index)
-        domain = var.domain
+        domain = var.dns_domain
       }
 
       network_interface {
@@ -102,7 +98,7 @@ resource "vsphere_virtual_machine" "vm" {
       ipv4_gateway = element(var.ip_gateway_list, count.index)
       # ipv4_gateway    = var.ip_gateway
       dns_server_list = var.dns_server_list
-      dns_suffix_list = var.dns_suffix_list
+      # dns_suffix_list = var.dns_suffix_list
     }
   }
 
@@ -149,7 +145,7 @@ resource "null_resource" "vm" {
   }
 
   provisioner "file" {
-    source      = "/Users/edwardingram/code/Terraform/files/shell/post_script.sh"
+    source      = "${path.module}/scripts/post_script.sh"
     destination = "/home/ansible/post_script.sh"
   }
 
