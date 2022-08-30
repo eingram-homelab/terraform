@@ -1,5 +1,20 @@
 # Deploy RHEL8.5 VMs
 
+terraform {
+ backend "gcs" {
+   bucket  = "yc-srv1-bucket-tfstate"
+   prefix  = "terraform/state"
+   credentials = "yc-srv1-proj-cd5c053a1b32.json"
+ }
+}
+
+provider "google" {
+  credentials = "yc-srv1-proj-cd5c053a1b32.json"
+  gcp_project = var.gcp_project
+  gcp_region  = var.gcp_region
+  gcp_zone    = var.gcp_zone
+}
+
 provider "vault" {
 }
 data "vault_generic_secret" "vsphere_username" {
@@ -87,7 +102,7 @@ resource "vsphere_virtual_machine" "vm" {
     customize {
       linux_options {
         host_name = element(var.vm_name_list, count.index)
-        domain = var.dns_domain
+        domain = element(var.dns_suffix_list, count.index)
       }
 
       network_interface {
@@ -98,7 +113,7 @@ resource "vsphere_virtual_machine" "vm" {
       ipv4_gateway = element(var.ip_gateway_list, count.index)
       # ipv4_gateway    = var.ip_gateway
       dns_server_list = var.dns_server_list
-      # dns_suffix_list = var.dns_suffix_list
+      dns_suffix_list = var.dns_suffix_list
     }
   }
 

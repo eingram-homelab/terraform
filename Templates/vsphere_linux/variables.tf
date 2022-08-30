@@ -1,3 +1,15 @@
+variable "gcp_project" {
+  default = "yc-srv1-proj"
+}
+
+variable "gcp_region" {
+  default = "us-west1"
+}
+
+variable "gcp_zone" {
+  default = "us-west1-a"
+}
+
 variable "vsphere_username" {
   default   = ""
   sensitive = true
@@ -102,7 +114,7 @@ variable "dns_server_list" {
   "192.168.1.251"]
 }
 
-# variable "dns_suffix_list" {
-#   type    = list(any)
-#   default = ["local.lan"]
-# }
+variable "dns_suffix_list" {
+  type    = list(any)
+  default = ["local.lan"]
+}

@@ -14,11 +14,6 @@ provider "google" {
   zone    = var.gcp_zone
 }
 
-# resource "google_project_service" "project" {
-#   for_each = toset(var.project_service)
-#   service  = each.key
-
-
 resource "google_compute_network" "vpc_network" {
   name                    = var.vpc_name
   auto_create_subnetworks = false
