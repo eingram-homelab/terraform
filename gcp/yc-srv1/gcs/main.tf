@@ -1,5 +1,4 @@
 provider "google" {
-  # credentials = file(var.credentials_file)
   credentials = file(var.credentials_file)
   project = var.gcp_project
   region  = var.gcp_region
@@ -7,7 +6,7 @@ provider "google" {
 }
 
 resource "google_storage_bucket" "default" {
-  name          = var.bucket_name
+  name          = "yc-srv1-tfstate-test"
   force_destroy = false
   location      = "US"
   storage_class = "STANDARD"
@@ -18,8 +17,8 @@ resource "google_storage_bucket" "default" {
 
 terraform {
  backend "gcs" {
-   bucket  = "yc-srv1-bucket-tfstate"
-   prefix  = "terraform/state"
+   bucket  = var.bucket_name
+   prefix  = "terraform/state/"
    credentials = "yc-srv1-proj-cd5c053a1b32.json"
  }
 }

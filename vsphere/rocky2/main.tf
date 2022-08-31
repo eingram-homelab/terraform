@@ -1,19 +1,19 @@
-# Deploy RHEL8.5 VMs
-
-terraform {
- backend "gcs" {
-   bucket  = "yc-srv1-bucket-tfstate"
-   prefix  = "terraform/state/rocky2"
-   credentials = "yc-srv1-proj-cd5c053a1b32.json"
- }
-}
-
 provider "google" {
   credentials = "yc-srv1-proj-cd5c053a1b32.json"
-  gcp_project = var.gcp_project
-  gcp_region  = var.gcp_region
-  gcp_zone    = var.gcp_zone
+  project = var.gcp_project
+  region  = var.gcp_region
+  zone    = var.gcp_zone
 }
+
+# resource "google_storage_bucket" "default" {
+#   name          = "yc-srv1-bucket-tfstate"
+#   force_destroy = false
+#   location      = "US"
+#   storage_class = "STANDARD"
+#   versioning {
+#     enabled = false
+#   }
+# }
 
 provider "vault" {
 }
@@ -63,9 +63,9 @@ data "vsphere_virtual_machine" "template" {
   datacenter_id = data.vsphere_datacenter.dc.id
 }
 
-data "vsphere_folder" "folder" {
-  path          = "/HomeLab Datacenter/vm/Linux"
-}
+# data "vsphere_folder" "folder" {
+#   path          = "/HomeLab Datacenter/vm/Linux"
+# }
 
 resource "vsphere_virtual_machine" "vm" {
   
@@ -74,7 +74,7 @@ resource "vsphere_virtual_machine" "vm" {
 
   resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
   datastore_id     = data.vsphere_datastore.datastore[count.index].id
-  folder           = var.vm_folder_name
+  folder           = "/HomeLab Datacenter/vm/Linux"
   firmware         = "efi"
 
   num_cpus           = var.vm_cpu

@@ -1,6 +1,4 @@
-gcp_project      = "yc-srv1-proj"
-
-bucket_name = "yc-srv1-bucket-tfstate"
+gcp_project = "yc-srv1-proj"
 
 # project_service = [
 #   "cloudresourcemanager.googleapis.com",

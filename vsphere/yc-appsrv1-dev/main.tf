@@ -1,20 +1,5 @@
 # Deploy RHEL8.5 VMs
 
-terraform {
- backend "gcs" {
-   bucket  = "yc-srv1-bucket-tfstate"
-   prefix  = "terraform/state/rocky2"
-   credentials = "yc-srv1-proj-cd5c053a1b32.json"
- }
-}
-
-provider "google" {
-  credentials = "yc-srv1-proj-cd5c053a1b32.json"
-  gcp_project = var.gcp_project
-  gcp_region  = var.gcp_region
-  gcp_zone    = var.gcp_zone
-}
-
 provider "vault" {
 }
 data "vault_generic_secret" "vsphere_username" {
@@ -63,18 +48,24 @@ data "vsphere_virtual_machine" "template" {
   datacenter_id = data.vsphere_datacenter.dc.id
 }
 
-data "vsphere_folder" "folder" {
-  path          = "/HomeLab Datacenter/vm/Linux"
+resource "vsphere_folder" "folder" {
+  path          = var.proj_name
+  type          = "vm"
+  datacenter_id = data.vsphere_datacenter.dc.id
 }
 
 resource "vsphere_virtual_machine" "vm" {
+
+  depends_on = [
+    resource.vsphere_folder.folder
+  ]
   
   count = length(var.vm_name_list)
   name  = element(var.vm_name_list, count.index)
 
   resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
   datastore_id     = data.vsphere_datastore.datastore[count.index].id
-  folder           = var.vm_folder_name
+  folder           = var.proj_name
   firmware         = "efi"
 
   num_cpus           = var.vm_cpu
@@ -102,7 +93,7 @@ resource "vsphere_virtual_machine" "vm" {
     customize {
       linux_options {
         host_name = element(var.vm_name_list, count.index)
-        domain = element(var.dns_suffix_list, count.index)
+        domain = var.domain
       }
 
       network_interface {
@@ -160,7 +151,7 @@ resource "null_resource" "vm" {
   }
 
   provisioner "file" {
-    source      = "${path.module}/scripts/post_script.sh"
+    source      = "/Users/edwardingram/code/Terraform/files/shell/post_script.sh"
     destination = "/home/ansible/post_script.sh"
   }
 
