@@ -1,4 +1,9 @@
-# Deploy RHEL8.5 VMs
+provider "google" {
+  credentials = "yc-srv1-proj-cd5c053a1b32.json"
+  gcp_project = var.gcp_project
+  gcp_region  = var.gcp_region
+  gcp_zone    = var.gcp_zone
+}
 
 provider "vault" {
 }
