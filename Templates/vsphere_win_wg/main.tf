@@ -107,37 +107,14 @@ resource "vsphere_virtual_machine" "vm" {
       network_interface {
         ipv4_address = element(var.ip_address_list, count.index)
         ipv4_netmask = 24
-        dns_domain = var.dns_domain
-        # dns_domain = element(var.dns_suffix_list, count.index)
+        dns_domain = element(var.dns_suffix_list, count.index)
       }
 
       ipv4_gateway    = element(var.ip_gateway_list, count.index)
       dns_server_list = var.dns_server_list
+      dns_suffix_list = var.dns_suffix_list
     }
   }
-
-  # connection {
-  #   host     = self.clone.0.customize.0.network_interface.0.ipv4_address
-  #   # timeout  = "15m"
-  #   type     = "winrm"
-  #   port     = 5985
-  #   insecure = true
-  #   https    = false
-  #   use_ntlm = true
-  #   user     = "administrator"
-  #   password = data.vault_generic_secret.win_password.data["win_password"]
-  # }
-
-  # provisioner "file" {
-  #   source      = "/Users/edwardingram/code/Terraform/files/powershell/"
-  #   destination = "c:/temp"
-  # }
-
-  # provisioner "remote-exec" {
-  #   inline = [
-  #     "powershell -ExecutionPolicy Bypass -File c:\\temp\\config.ps1"
-  #   ]
-  # }
 }
 
 resource "null_resource" "vm" {
@@ -168,17 +145,5 @@ resource "null_resource" "vm" {
       "powershell -ExecutionPolicy Bypass -File c:\\temp\\config.ps1",
       "powershell -command Set-ItemProperty -Path HKLM:\\System\\CurrentControlSet\\Services\\Tcpip\\Parameters -Name Domain -Value local.lan"
     ]
-
-    # connection {
-    #   host = self.clone.0.customize.0.network_interface.0.ipv4_address
-    #   timeout  = "3m"
-    #   type     = "winrm"
-    #   port     = 5985
-    #   insecure = true
-    #   https = false
-    #   use_ntlm = true
-    #   user     = data.vault_generic_secret.hladmin_username.data["hladmin_username"]
-    #   password = data.vault_generic_secret.hladmin_password.data["hladmin_password"]
-    # }
   }
 }

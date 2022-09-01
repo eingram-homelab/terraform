@@ -55,7 +55,7 @@ variable "vsphere_template" {
 }
 
 variable "vm_folder_name" {
-  default = ""
+  default = "/HomeLab Datacenter/vm/Linux"
 }
 
 variable "esxi_hosts" {

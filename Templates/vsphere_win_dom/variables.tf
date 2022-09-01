@@ -120,6 +120,11 @@ variable "time_zone" {
   default = "004"
 }
 
-variable "dns_domain" {}
+variable "dns_suffix_list" {
+  type    = list(any)
+  default = []
+}
 
-variable "vm_folder_name" {}
+variable "vm_folder_name" {
+  default = "/HomeLab Datacenter/vm/WindowsHL"
+}

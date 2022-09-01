@@ -1,4 +1,3 @@
-vsphere_template  = "TMP-Rocky85_Packer_2022_07"
 vsphere_datastore_list = [
   "XN_iSCSI_SSD2"
 ]
@@ -17,7 +16,7 @@ ip_address_list = [
 ]
 
 dns_suffix_list = [
-  "local.lan",
+  "homelab.local",
   # "10.10.0.81",
   # "10.10.0.82"
 ]

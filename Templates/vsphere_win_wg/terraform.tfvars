@@ -1,4 +1,4 @@
-vsphere_template  = "TMP-Rocky85_Packer_2022_07"
+vsphere_template  = "TMP-Win2019_Packer_2022_02"
 vsphere_datastore_list = [
   "XN_iSCSI_SSD2"
 ]
@@ -28,4 +28,3 @@ ip_gateway_list    = [
 
 vm_ram        = 1024
 vm_cpu        = 1
-

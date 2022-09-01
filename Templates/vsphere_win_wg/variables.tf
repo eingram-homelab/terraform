@@ -88,7 +88,10 @@ variable "dns_server_list" {
   default = ["10.10.0.10"]
 }
 
-variable "dns_domain" {}
+variable "dns_suffix_list" {
+  type    = list(any)
+  default = []
+}
 
 variable "full_name" {
   type    = string
@@ -107,4 +110,6 @@ variable "time_zone" {
 
 variable "workgroup" {}
 
-variable "vm_folder_name" {}
+variable "vm_folder_name" {
+  default = "/HomeLab Datacenter/vm/WindowsWG"
+}

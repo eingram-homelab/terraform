@@ -106,7 +106,7 @@ resource "vsphere_virtual_machine" "vm" {
         organization_name     = var.organization_name
         auto_logon            = "true"
         time_zone             = var.time_zone
-        join_domain           = var.dns_domain
+        join_domain           = element(var.dns_suffix_list, count.index)
         domain_admin_user     = data.vault_generic_secret.hladmin_username.data["hladmin_username"]
         domain_admin_password = data.vault_generic_secret.hladmin_password.data["hladmin_password"]
         # run_once_command_list = ""
@@ -115,39 +115,14 @@ resource "vsphere_virtual_machine" "vm" {
       network_interface {
         ipv4_address = element(var.ip_address_list, count.index)
         ipv4_netmask = 24
+        # dns_domain = element(var.dns_suffix_list, count.index)
       }
 
       ipv4_gateway    = element(var.ip_gateway_list, count.index)
       dns_server_list = var.dns_server_list
-      # dns_suffix_list = var.dns_suffix_list
+      dns_suffix_list = var.dns_suffix_list
     }
   }
-
-  # connection {
-  #   host     = self.clone.0.customize.0.network_interface.0.ipv4_address
-  #   # timeout  = "15m"
-  #   type     = "winrm"
-  #   port     = 5985
-  #   insecure = true
-  #   https    = false
-  #   use_ntlm = true
-  #   user     = "administrator"
-  #   password = "NL2B1r13"
-  #   # password = data.vault_generic_secret.win_password.data["win_password"]
-  #   # user     = data.vault_generic_secret.hladmin_username.data["hladmin_username"]
-  #   # password = data.vault_generic_secret.hladmin_password.data["hladmin_password"]
-  # }
-
-  # provisioner "file" {
-  #   source      = "/Users/edwardingram/code/Terraform/files/powershell/"
-  #   destination = "c:/temp"
-  # }
-
-  # provisioner "remote-exec" {
-  #   inline = [
-  #     "powershell -ExecutionPolicy Bypass -File c:\\temp\\config.ps1"
-  #   ]
-  # }
 }
 
 resource "null_resource" "vm" {
@@ -177,5 +152,12 @@ resource "null_resource" "vm" {
     inline = [
       "powershell -ExecutionPolicy Bypass -File c:\\temp\\config.ps1"
     ]
+  }
+
+  provisioner "remote-exec" {
+    when    = destroy
+    command = <<-EOT
+      "cmd /c powershell.exe Remove-Computer -Force -Confirm:$False"
+    EOT
   }
 }
