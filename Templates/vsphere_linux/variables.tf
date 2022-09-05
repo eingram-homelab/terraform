@@ -54,10 +54,6 @@ variable "vsphere_template" {
   default = ""
 }
 
-variable "vm_folder_name" {
-  default = "/HomeLab Datacenter/vm/Linux"
-}
-
 variable "esxi_hosts" {
   default = []
 }
@@ -117,4 +113,8 @@ variable "dns_server_list" {
 variable "dns_suffix_list" {
   type    = list(any)
   default = ["local.lan"]
+}
+
+variable "vm_folder_name" {
+  default = "Linux"
 }

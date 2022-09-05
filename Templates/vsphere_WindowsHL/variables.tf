@@ -126,5 +126,5 @@ variable "dns_suffix_list" {
 }
 
 variable "vm_folder_name" {
-  default = "/HomeLab Datacenter/vm/WindowsHL"
+  default = "WindowsHL"
 }

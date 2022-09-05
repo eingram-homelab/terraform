@@ -111,5 +111,5 @@ variable "time_zone" {
 variable "workgroup" {}
 
 variable "vm_folder_name" {
-  default = "/HomeLab Datacenter/vm/WindowsWG"
+  default = "WindowsWG"
 }
