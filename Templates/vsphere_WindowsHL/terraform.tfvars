@@ -1,4 +1,4 @@
-vsphere_template  = "TMP-Win2019_Packer_2022_02"
+vsphere_template = "TMP-Win2022Core_Packer_2022_08"
 vsphere_datastore_list = [
   "XN_iSCSI_SSD2"
 ]
@@ -17,7 +17,7 @@ ip_address_list = [
 ]
 
 dns_suffix_list = [
-  "local.lan",
+  "homelab.local",
   # "10.10.0.81",
   # "10.10.0.82"
 ]
@@ -28,3 +28,4 @@ ip_gateway_list    = [
 
 vm_ram        = 1024
 vm_cpu        = 1
+

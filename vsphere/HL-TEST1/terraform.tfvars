@@ -1,5 +1,4 @@
 vsphere_template = "TMP-Win2022Core_Packer_2022_08"
-vm_folder_name = "/HomeLab Datacenter/vm/Linux"
 vsphere_datastore_list = [
   "XN_iSCSI_SSD2"
 ]

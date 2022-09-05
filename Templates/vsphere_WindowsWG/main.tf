@@ -1,5 +1,5 @@
 provider "google" {
-  credentials = "yc-srv1-proj-cd5c053a1b32.json"
+  credentials = "~/keys/yc-srv1-proj.json"
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
@@ -48,10 +48,6 @@ data "vsphere_network" "network" {
 data "vsphere_virtual_machine" "template" {
   name          = var.vsphere_template
   datacenter_id = data.vsphere_datacenter.dc.id
-}
-
-data "vsphere_folder" "folder" {
-  path          = "/HomeLab Datacenter/vm/WindowsWG"
 }
 
 resource "vsphere_virtual_machine" "vm" {

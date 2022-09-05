@@ -1,5 +1,5 @@
 provider "google" {
-  credentials = "~/keys/yc-srv1-proj.json"
+  credentials = "~/keys/yc-srv-proj.json"
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
@@ -13,11 +13,14 @@ data "vault_generic_secret" "vsphere_username" {
 data "vault_generic_secret" "vsphere_password" {
   path = "secret/vsphere/vcsa"
 }
-data "vault_generic_secret" "ssh_username" {
-  path = "secret/ssh/ansible"
+data "vault_generic_secret" "win_password" {
+  path = "secret/win/administrator"
 }
-data "vault_generic_secret" "ssh_password" {
-  path = "secret/ssh/ansible"
+data "vault_generic_secret" "hladmin_username" {
+  path = "secret/win/homelab"
+}
+data "vault_generic_secret" "hladmin_password" {
+  path = "secret/win/homelab"
 }
 
 provider "vsphere" {
@@ -32,7 +35,7 @@ data "vsphere_datacenter" "dc" {
 }
 
 data "vsphere_datastore" "datastore" {
-  count     = length(var.vsphere_datastore_list)
+  count         = length(var.vsphere_datastore_list)
   name          = element(var.vsphere_datastore_list, count.index)
   datacenter_id = data.vsphere_datacenter.dc.id
 }
@@ -43,7 +46,7 @@ data "vsphere_compute_cluster" "cluster" {
 }
 
 data "vsphere_network" "network" {
-  count = length(var.vsphere_network_list)
+  count         = length(var.vsphere_network_list)
   name          = element(var.vsphere_network_list, count.index)
   datacenter_id = data.vsphere_datacenter.dc.id
 }
@@ -54,7 +57,7 @@ data "vsphere_virtual_machine" "template" {
 }
 
 resource "vsphere_virtual_machine" "vm" {
-  
+
   count = length(var.vm_name_list)
   name  = element(var.vm_name_list, count.index)
 
@@ -82,22 +85,36 @@ resource "vsphere_virtual_machine" "vm" {
     thin_provisioned = data.vsphere_virtual_machine.template.disks.0.thin_provisioned
   }
 
+  disk {
+    label       = "disk1"
+    size        = "40"
+    unit_number = 1
+  }
+
   clone {
     template_uuid = data.vsphere_virtual_machine.template.id
 
     customize {
-      linux_options {
-        host_name = element(var.vm_name_list, count.index)
-        domain = element(var.dns_suffix_list, count.index)
+      windows_options {
+        computer_name         = element(var.vm_name_list, count.index)
+        admin_password        = data.vault_generic_secret.win_password.data["win_password"]
+        full_name             = var.full_name
+        organization_name     = var.organization_name
+        auto_logon            = "true"
+        time_zone             = var.time_zone
+        join_domain           = element(var.dns_suffix_list, count.index)
+        domain_admin_user     = data.vault_generic_secret.hladmin_username.data["hladmin_username"]
+        domain_admin_password = data.vault_generic_secret.hladmin_password.data["hladmin_password"]
+        # run_once_command_list = ""
       }
 
       network_interface {
         ipv4_address = element(var.ip_address_list, count.index)
         ipv4_netmask = 24
+        # dns_domain = element(var.dns_suffix_list, count.index)
       }
 
-      ipv4_gateway = element(var.ip_gateway_list, count.index)
-      # ipv4_gateway    = var.ip_gateway
+      ipv4_gateway    = element(var.ip_gateway_list, count.index)
       dns_server_list = var.dns_server_list
       dns_suffix_list = var.dns_suffix_list
     }
@@ -105,31 +122,31 @@ resource "vsphere_virtual_machine" "vm" {
 }
 
 resource "null_resource" "vm" {
-
   triggers = {
     ip = join(",", vsphere_virtual_machine.vm.*.default_ip_address)
   }
   count = length(var.vm_name_list)
 
   connection {
-    type     = "ssh"
-    agent    = false
-    # host     = self.clone.0.customize.0.network_interface.0.ipv4_address
+    # host = self.clone.0.customize.0.network_interface.0.ipv4_address
     host     = element(var.ip_address_list, count.index)
-    user     = data.vault_generic_secret.ssh_username.data["ssh_username"]
-    password = data.vault_generic_secret.ssh_password.data["ssh_password"]
+    type     = "winrm"
+    port     = 5985
+    insecure = true
+    https    = false
+    use_ntlm = true
+    user     = data.vault_generic_secret.hladmin_username.data["hladmin_username"]
+    password = data.vault_generic_secret.hladmin_password.data["hladmin_password"]
   }
 
   provisioner "file" {
-    source      = "${path.module}/scripts/post_script.sh"
-    destination = "/home/ansible/post_script.sh"
+    source      = "/Users/edwardingram/code/Terraform/files/powershell/"
+    destination = "c:/temp"
   }
 
   provisioner "remote-exec" {
     inline = [
-      # "echo ${data.vault_generic_secret.ssh_password.data["ssh_password"]} | sudo -S subscription-manager register --force --username ${data.vault_generic_secret.sub_email.data["sub_email"]} --password ${data.vault_generic_secret.sub_password.data["sub_password"]} --auto-attach",
-      "chmod +x /home/ansible/post_script.sh",
-      "echo ${data.vault_generic_secret.ssh_password.data["ssh_password"]} | sudo -S /home/ansible/post_script.sh"
+      "powershell -ExecutionPolicy Bypass -File c:\\temp\\config.ps1"
     ]
   }
 }
