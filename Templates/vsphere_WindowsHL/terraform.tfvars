@@ -39,6 +39,5 @@ vm_cpu        = 1
     # id = 2,
 #     size = 60,
 #     thin_provisioned = true,
-#     eagerly_scrub = false
 #   }
 # ]
