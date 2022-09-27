@@ -82,6 +82,16 @@ resource "vsphere_virtual_machine" "vm" {
     thin_provisioned = data.vsphere_virtual_machine.template.disks.0.thin_provisioned
   }
 
+  dynamic "disk" {
+    for_each = var.vm_disks_list
+    content {
+      label = disk.value["label"]
+      unit_number = disk.value["id"]
+      size = disk.value["size"]
+      thin_provisioned = disk.value["thin_provisioned"]
+    }
+  }
+
   clone {
     template_uuid = data.vsphere_virtual_machine.template.id
 

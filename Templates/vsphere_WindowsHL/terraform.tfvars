@@ -1,6 +1,8 @@
 vsphere_template = "TMP-Win2022Core_Packer_2022_08"
 vsphere_datastore_list = [
-  "XN_iSCSI_SSD2"
+  "XN_iSCSI_SSD2",
+  # "XN_iSCSI_SSD2",
+  # "XN_iSCSI_SSD2"
 ]
 
 vsphere_network_list   = [
@@ -23,9 +25,20 @@ dns_suffix_list = [
 ]
 
 ip_gateway_list    = [
-  "10.10.0.1"
+  "10.10.0.1",
+  # "10.10.0.1",
+  # "10.10.0.1"
 ]
 
 vm_ram        = 1024
 vm_cpu        = 1
 
+# vm_disks_list = [
+#   { 
+#     label = "longhorn1",
+    # id = 2,
+#     size = 60,
+#     thin_provisioned = true,
+#     eagerly_scrub = false
+#   }
+# ]

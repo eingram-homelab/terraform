@@ -113,3 +113,7 @@ variable "workgroup" {}
 variable "vm_folder_name" {
   default = "WindowsWG"
 }
+
+variable "vm_disks_list" {
+  default = []
+}

@@ -128,3 +128,7 @@ variable "dns_suffix_list" {
 variable "vm_folder_name" {
   default = "WindowsHL"
 }
+
+variable "vm_disks_list" {
+  default = []
+}

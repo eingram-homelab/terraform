@@ -28,3 +28,13 @@ ip_gateway_list    = [
 
 vm_ram        = 1024
 vm_cpu        = 1
+
+# vm_disks_list = [
+#   { 
+#     label = "longhorn1",
+    # id = 2,
+#     size = 60,
+#     thin_provisioned = true,
+#     eagerly_scrub = false
+#   }
+# ]

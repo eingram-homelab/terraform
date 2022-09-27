@@ -1,4 +1,4 @@
-vsphere_template  = "TMP-Rocky85_Packer_2022_07"
+vsphere_template  = "TMP-Rocky85_Packer_2022_09"
 vsphere_datastore_list = [
   "XN_iSCSI_SSD2"
 ]
@@ -29,3 +29,12 @@ ip_gateway_list    = [
 vm_ram        = 1024
 vm_cpu        = 1
 
+# vm_disks_list = [
+#   { 
+#     label = "longhorn1",
+    # id = 1,
+#     size = 60,
+#     thin_provisioned = true,
+#     eagerly_scrub = false
+#   }
+# ]
