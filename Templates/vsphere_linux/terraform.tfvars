@@ -1,4 +1,4 @@
-vsphere_template  = "TMP-Rocky85_Packer_2022_09"
+vsphere_template  = "TMP-Rocky85_Packer"
 vsphere_datastore_list = [
   "XN_iSCSI_SSD2"
 ]

@@ -1,4 +1,4 @@
-vsphere_template = "TMP-Win2022Core_Packer_2022_08"
+vsphere_template = "TMP-Win2022Core_Packer"
 vsphere_datastore_list = [
   "XN_iSCSI_SSD2"
 ]
