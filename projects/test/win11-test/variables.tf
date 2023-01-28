@@ -1,15 +1,3 @@
-variable "gcp_project" {
-  default = "yc-srv1-proj"
-}
-
-variable "gcp_region" {
-  default = "us-west1"
-}
-
-variable "gcp_zone" {
-  default = "us-west1-a"
-}
-
 variable "vsphere_username" {
   default   = ""
   sensitive = true
@@ -25,11 +13,7 @@ variable "vsphere_server" {
 }
 
 variable "vm_name_list" {
-    type=list(any)
-}
-
-variable "dns_domain" {
-  default = "local.lan"
+  type = list(any)
 }
 
 variable "vm_ram" {
@@ -47,7 +31,7 @@ variable "vsphere_compute_cluster" {
 }
 
 variable "vsphere_datastore_list" {
-    type = list(any)
+  type = list(any)
 }
 
 variable "vsphere_template" {
@@ -64,7 +48,7 @@ variable "network_interfaces" {
 }
 
 variable "vsphere_network_list" {
-    type = list(any)
+  type = list(any)
 }
 
 variable "port_group_name" {
@@ -83,13 +67,7 @@ variable "vsphere_hardware_version" {
   default = ""
 }
 
-variable "ssh_username" {
-  default   = ""
-  type      = string
-  sensitive = true
-}
-
-variable "ssh_password" {
+variable "win_password" {
   default   = ""
   type      = string
   sensitive = true
@@ -101,24 +79,47 @@ variable "ip_address_list" {
 }
 
 variable "ip_gateway_list" {
-  type = list(any)
+  type    = list(any)
+  default = []
 }
 
 variable "dns_server_list" {
-  type = list(any)
-  default = ["192.168.1.250",
-  "192.168.1.251"]
+  type    = list(any)
+  default = ["10.10.0.10"]
 }
 
 variable "dns_suffix_list" {
   type    = list(any)
-  default = ["local.lan"]
+  default = []
 }
 
+variable "full_name" {
+  type    = string
+  default = "Edward Ingram"
+}
+
+variable "organization_name" {
+  type    = string
+  default = "HomeLab"
+}
+
+variable "time_zone" {
+  type    = string
+  default = "004"
+}
+
+variable "workgroup" {}
+
 variable "vm_folder_name" {
-  default = "Linux"
+  default = "WindowsWG"
 }
 
 variable "vm_disks_list" {
   default = []
+}
+
+variable "vsphere_storage_policy" {}
+
+variable "vm_efi_secure" {
+  default = false
 }

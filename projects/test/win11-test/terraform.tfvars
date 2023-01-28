@@ -1,19 +1,24 @@
-vsphere_template  = "TMP-Rocky85_Packer"
+vsphere_template = "TMP-Win11_Packer"
 vsphere_datastore_list = [
-  "XN_iSCSI_SSD2"
+  "vsanDatastore",
+  # "XN_iSCSI_SSD2",
+  # "XN_iSCSI_SSD2"
 ]
 
 vsphere_storage_policy = "vSAN - No Fault Tolerance"
 
 vsphere_network_list   = [
-  "Lab-LAN1"
+  "DPG-Lab-LAN1"
 ]
 vm_name_list = [
-  "Test"
+  "win11-test"
 ]
 
+workgroup = "WORKGROUP"
+vm_folder_name = "WindowsWG"
+
 ip_address_list = [
-  "10.10.0.94",
+  "10.10.0.23",
   # "10.10.0.81",
   # "10.10.0.82"
 ]
@@ -25,17 +30,19 @@ dns_suffix_list = [
 ]
 
 ip_gateway_list    = [
-  "10.10.0.1"
+  "10.10.0.1",
+  # "10.10.0.1",
+  # "10.10.0.1"
 ]
 
-vm_ram        = 1024
-vm_cpu        = 1
+vm_ram = 4096
+vm_cpu = 2
 vm_efi_secure = true
 
 # vm_disks_list = [
 #   { 
 #     label = "longhorn1",
-    # id = 1,
+    # id = 2,
 #     size = 60,
 #     thin_provisioned = true,
 #   }

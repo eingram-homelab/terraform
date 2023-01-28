@@ -123,6 +123,8 @@ variable "vm_disks_list" {
   default = []
 }
 
+variable "vsphere_storage_policy" {}
+
 variable "vm_efi_secure" {
   default = false
 }

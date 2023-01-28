@@ -3,6 +3,8 @@ vsphere_datastore_list = [
   "XN_iSCSI_SSD2"
 ]
 
+vsphere_storage_policy = "vSAN - No Fault Tolerance"
+
 vsphere_network_list   = [
   "Lab-LAN1"
 ]
@@ -28,6 +30,7 @@ ip_gateway_list    = [
 
 vm_ram        = 1024
 vm_cpu        = 1
+vm_efi_secure = true
 
 # vm_disks_list = [
 #   { 
