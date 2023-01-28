@@ -117,3 +117,7 @@ variable "vm_folder_name" {
 variable "vm_disks_list" {
   default = []
 }
+
+variable "vm_efi_secure" {
+  default = false
+}
