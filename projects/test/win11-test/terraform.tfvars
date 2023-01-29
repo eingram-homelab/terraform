@@ -18,7 +18,7 @@ workgroup = "WORKGROUP"
 vm_folder_name = "WindowsWG"
 
 ip_address_list = [
-  "10.10.0.23",
+  "10.10.0.24",
   # "10.10.0.81",
   # "10.10.0.82"
 ]
