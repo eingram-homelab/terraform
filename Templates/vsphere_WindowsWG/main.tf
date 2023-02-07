@@ -16,6 +16,9 @@ data "vault_generic_secret" "vsphere_password" {
 data "vault_generic_secret" "win_password" {
   path = "secret/win/administrator"
 }
+data "vault_generic_secret" "ssh_password" {
+  path = "secret/ssh/eingram"
+}
 
 provider "vsphere" {
   user                 = data.vault_generic_secret.vsphere_username.data["vsphere_username"]
@@ -113,7 +116,10 @@ resource "vsphere_virtual_machine" "vm" {
         auto_logon            = "true"
         time_zone             = var.time_zone
         workgroup             = var.workgroup
-        # run_once_command_list = ""
+        run_once_command_list = <<-EOT
+          password = ConvertTo-SecureString "${data.vault_generic_secret.ssh_password.data["ssh_password"]}" -AsPlainText -Force  
+          New-LocalUser -Name "ansible" -Password $password -FullName "Ansible" -Description "Ansible service account"
+        EOT
       }
 
       network_interface {
