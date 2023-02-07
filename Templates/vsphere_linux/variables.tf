@@ -83,12 +83,6 @@ variable "vsphere_hardware_version" {
   default = ""
 }
 
-variable "ssh_username" {
-  default   = ""
-  type      = string
-  sensitive = true
-}
-
 variable "ssh_password" {
   default   = ""
   type      = string
