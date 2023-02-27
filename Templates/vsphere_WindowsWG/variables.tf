@@ -8,6 +8,9 @@ variable "vsphere_password" {
   sensitive = true
 }
 
+variable login_approle_role_id {}
+variable login_approle_secret_id {}
+  
 variable "vsphere_server" {
   default = "vcsa-1.local.lan"
 }

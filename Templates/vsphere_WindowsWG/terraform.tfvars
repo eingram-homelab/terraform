@@ -30,7 +30,7 @@ ip_gateway_list    = [
 
 vm_ram        = 1024
 vm_cpu        = 1
-vm_efi_secure = true
+vm_efi_secure = false
 
 # vm_disks_list = [
 #   { 

@@ -6,7 +6,16 @@ provider "google" {
 }
 
 provider "vault" {
+  auth_login {
+    path = "auth/approle/login"
+
+    parameters = {
+      role_id   = var.login_approle_role_id
+      secret_id = var.login_approle_secret_id
+    }
+  }
 }
+
 data "vault_generic_secret" "vsphere_username" {
   path = "secret/vsphere/vcsa"
 }
@@ -116,10 +125,10 @@ resource "vsphere_virtual_machine" "vm" {
         auto_logon            = "true"
         time_zone             = var.time_zone
         workgroup             = var.workgroup
-        run_once_command_list = <<-EOT
-          password = ConvertTo-SecureString "${data.vault_generic_secret.ssh_password.data["ssh_password"]}" -AsPlainText -Force  
-          New-LocalUser -Name "ansible" -Password $password -FullName "Ansible" -Description "Ansible service account"
-        EOT
+        run_once_command_list = [  
+          "cmd /c powershell.exe New-LocalUser -Name 'ansible' -Password (ConvertTo-SecureString ${data.vault_generic_secret.win_password.data["win_password"]} -AsPlainText -Force) -FullName 'Ansible' -Description 'Ansible service account'",
+          "cmd /c powershell.exe Add-LocalGroupMember -Group 'Administrators' -Member 'ansible'"
+        ]
       }
 
       network_interface {
