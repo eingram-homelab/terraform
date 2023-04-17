@@ -4,7 +4,7 @@ storage = "zpool0"
 vlan = 200
 
 vm_name_list = [
-  "Test2"
+  "test.local.lan"
 ]
 
 ip_address_list = [
