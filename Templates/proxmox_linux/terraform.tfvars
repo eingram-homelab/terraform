@@ -2,9 +2,10 @@ proxmox_template  = "Rocky9-TMP"
 storage = "zpool0"
 
 vlan = 200
+tags = "linux"
 
 vm_name_list = [
-  "test.local.lan"
+  "test2.local.lan"
 ]
 
 ip_address_list = [

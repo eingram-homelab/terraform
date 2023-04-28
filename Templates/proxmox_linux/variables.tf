@@ -38,6 +38,8 @@ variable "vm_ram" {
 variable "vm_cores" {
 }
 
+variable "tags" {}
+
 variable "disk_size" {}
 
 variable "storage" {}

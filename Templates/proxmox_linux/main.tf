@@ -53,6 +53,7 @@ resource "proxmox_vm_qemu" "vm" {
   count = length(var.vm_name_list)
   name  = element(var.vm_name_list, count.index)
   target_node = var.proxmox_node
+  tags = var.tags
 
   clone = var.proxmox_template
   full_clone = "true"
