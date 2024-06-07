@@ -1,3 +1,18 @@
+variable "gcp_project" {
+  default = "proj-yc-srv1"
+}
+
+variable "gcp_region" {
+  default = "us-west1"
+}
+
+variable "gcp_zone" {
+  default = "us-west1-a"
+}
+
+variable login_approle_role_id {}
+variable login_approle_secret_id {}
+
 variable "vsphere_username" {
   default   = ""
   sensitive = true
@@ -32,6 +47,10 @@ variable "vsphere_compute_cluster" {
 
 variable "vsphere_datastore_list" {
   type = list(any)
+}
+
+variable "vsphere_storage_policy" {
+  default = ""
 }
 
 variable "vsphere_template" {
@@ -100,10 +119,10 @@ variable "dns_server_list" {
   default = ["10.10.0.10"]
 }
 
-# variable "dns_suffix_list" {
-#   type    = list(any)
-#   default = ["homelab.local"]
-# }
+variable "dns_suffix_list" {
+  type    = list(any)
+  default = ["homelab.local"]
+}
 
 variable "full_name" {
   type    = string
@@ -120,20 +139,13 @@ variable "time_zone" {
   default = "004"
 }
 
-variable "dns_suffix_list" {
-  type    = list(any)
-  default = []
-}
-
-variable "vm_folder_name" {
-  default = "WindowsHL"
-}
+variable "vm_folder_name" {}
 
 variable "vm_disks_list" {
   default = []
 }
 
-variable "vsphere_storage_policy" {}
+variable "workgroup" {}
 
 variable "vm_efi_secure" {
   default = false

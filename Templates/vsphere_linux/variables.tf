@@ -1,5 +1,5 @@
 variable "gcp_project" {
-  default = "yc-srv1-proj"
+  default = "proj-yc-srv1"
 }
 
 variable "gcp_region" {
@@ -9,6 +9,9 @@ variable "gcp_region" {
 variable "gcp_zone" {
   default = "us-west1-a"
 }
+
+variable login_approle_role_id {}
+variable login_approle_secret_id {}
 
 variable "vsphere_username" {
   default   = ""
@@ -26,10 +29,6 @@ variable "vsphere_server" {
 
 variable "vm_name_list" {
     type=list(any)
-}
-
-variable "dns_domain" {
-  default = "local.lan"
 }
 
 variable "vm_ram" {
@@ -50,8 +49,20 @@ variable "vsphere_datastore_list" {
     type = list(any)
 }
 
+variable "vsphere_storage_policy" {
+  default = ""
+}
+
 variable "vsphere_template" {
   default = ""
+}
+
+variable "vm_folder_name" {
+  default = ""
+}
+
+variable "vm_disks_list" {
+  default = []
 }
 
 variable "esxi_hosts" {
@@ -83,6 +94,12 @@ variable "vsphere_hardware_version" {
   default = ""
 }
 
+variable "ssh_username" {
+  default   = ""
+  type      = string
+  sensitive = true
+}
+
 variable "ssh_password" {
   default   = ""
   type      = string
@@ -109,15 +126,9 @@ variable "dns_suffix_list" {
   default = ["local.lan"]
 }
 
-variable "vm_folder_name" {
-  default = "Linux"
+variable "workgroup" {
+  default = ""
 }
-
-variable "vm_disks_list" {
-  default = []
-}
-
-variable "vsphere_storage_policy" {}
 
 variable "vm_efi_secure" {
   default = false

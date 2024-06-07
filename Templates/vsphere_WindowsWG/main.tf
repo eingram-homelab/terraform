@@ -6,14 +6,6 @@ provider "google" {
 }
 
 provider "vault" {
-  auth_login {
-    path = "auth/approle/login"
-
-    parameters = {
-      role_id   = var.login_approle_role_id
-      secret_id = var.login_approle_secret_id
-    }
-  }
 }
 
 data "vault_generic_secret" "vsphere_username" {
@@ -24,9 +16,6 @@ data "vault_generic_secret" "vsphere_password" {
 }
 data "vault_generic_secret" "win_password" {
   path = "secret/win/administrator"
-}
-data "vault_generic_secret" "ssh_password" {
-  path = "secret/ssh/eingram"
 }
 
 provider "vsphere" {
@@ -122,7 +111,7 @@ resource "vsphere_virtual_machine" "vm" {
         admin_password        = data.vault_generic_secret.win_password.data["win_password"]
         full_name             = var.full_name
         organization_name     = var.organization_name
-        auto_logon            = "true"
+        auto_logon            = true
         time_zone             = var.time_zone
         workgroup             = var.workgroup
         run_once_command_list = [  

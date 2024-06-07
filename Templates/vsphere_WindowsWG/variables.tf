@@ -1,3 +1,18 @@
+variable "gcp_project" {
+  default = "proj-yc-srv1"
+}
+
+variable "gcp_region" {
+  default = "us-west1"
+}
+
+variable "gcp_zone" {
+  default = "us-west1-a"
+}
+
+variable login_approle_role_id {}
+variable login_approle_secret_id {}
+
 variable "vsphere_username" {
   default   = ""
   sensitive = true
@@ -8,9 +23,6 @@ variable "vsphere_password" {
   sensitive = true
 }
 
-variable login_approle_role_id {}
-variable login_approle_secret_id {}
-  
 variable "vsphere_server" {
   default = "vcsa-1.local.lan"
 }
@@ -35,6 +47,10 @@ variable "vsphere_compute_cluster" {
 
 variable "vsphere_datastore_list" {
   type = list(any)
+}
+
+variable "vsphere_storage_policy" {
+  default = ""
 }
 
 variable "vsphere_template" {
@@ -86,14 +102,14 @@ variable "ip_gateway_list" {
   default = []
 }
 
+variable "dns_suffix_list" {
+  type    = list(any)
+  default = ["local.lan"]
+}
+
 variable "dns_server_list" {
   type    = list(any)
   default = ["10.10.0.10"]
-}
-
-variable "dns_suffix_list" {
-  type    = list(any)
-  default = []
 }
 
 variable "full_name" {
@@ -113,15 +129,11 @@ variable "time_zone" {
 
 variable "workgroup" {}
 
-variable "vm_folder_name" {
-  default = "WindowsWG"
-}
+variable "vm_folder_name" {}
 
 variable "vm_disks_list" {
   default = []
 }
-
-variable "vsphere_storage_policy" {}
 
 variable "vm_efi_secure" {
   default = false
