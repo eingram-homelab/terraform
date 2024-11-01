@@ -1,0 +1,214 @@
+data "vault_generic_secret" "vsphere_username" {
+  path = "secret/vsphere/vcsa"
+}
+
+data "vault_generic_secret" "vsphere_password" {
+  path = "secret/vsphere/vcsa"
+}
+
+data "vault_generic_secret" "ssh_password" {
+  path = "secret/ssh/ansible"
+}
+
+data "vsphere_datacenter" "dc" {
+  name = var.vsphere_datacenter
+}
+
+data "vsphere_datastore" "datastore" {
+  count         = length(var.vsphere_datastore_list)
+  name          = element(var.vsphere_datastore_list, count.index)
+  datacenter_id = data.vsphere_datacenter.dc.id
+}
+
+data "vsphere_datastore" "disk_datastore" {
+  count         = var.disk_datastore != "" ? 1 : 0
+  name          = var.disk_datastore
+  datacenter_id = data.vsphere_datacenter.dc.id
+}
+
+data "vsphere_compute_cluster" "cluster" {
+  name          = var.vsphere_compute_cluster
+  datacenter_id = data.vsphere_datacenter.dc.id
+}
+
+data "vsphere_network" "network" {
+  count         = length(var.vsphere_network_list)
+  name          = element(var.vsphere_network_list, count.index)
+  datacenter_id = data.vsphere_datacenter.dc.id
+}
+
+data "vsphere_virtual_machine" "template" {
+  name          = var.vsphere_template
+  datacenter_id = data.vsphere_datacenter.dc.id
+}
+
+locals {
+  # interface_count     = length(var.ipv4submask) #Used for Subnet handeling
+  template_disk_count = length(data.vsphere_virtual_machine.template.disks)
+}
+
+resource "vsphere_virtual_machine" "vm" {
+
+  count = length(var.vm_name_list)
+  name  = element(var.vm_name_list, count.index)
+
+  resource_pool_id  = data.vsphere_compute_cluster.cluster.resource_pool_id
+  datastore_id      = data.vsphere_datastore.datastore[count.index].id
+  storage_policy_id = var.vsphere_storage_policy_id
+  folder            = "/HomeLab Datacenter/vm/${var.vm_folder_name}"
+  firmware          = "efi"
+  efi_secure_boot_enabled = var.vm_efi_secure
+
+  num_cpus           = var.vm_cpu
+  memory             = var.vm_ram
+  memory_reservation = var.vm_ram
+  guest_id           = data.vsphere_virtual_machine.template.guest_id
+
+  scsi_type = data.vsphere_virtual_machine.template.scsi_type
+
+  network_interface {
+    network_id   = data.vsphere_network.network[count.index].id
+    adapter_type = data.vsphere_virtual_machine.template.network_interface_types[0]
+  }
+
+  dynamic "disk" {
+    for_each = data.vsphere_virtual_machine.template.disks
+    iterator = template_disks
+    content {
+      label             = length(var.disk_label) > 0 ? var.disk_label[template_disks.key] : "disk${template_disks.key}"
+      size              = var.disk_size_gb != null ? var.disk_size_gb[template_disks.key] : data.vsphere_virtual_machine.template.disks[template_disks.key].size
+      unit_number       = var.scsi_controller != null ? var.scsi_controller * 15 + template_disks.key : template_disks.key
+      thin_provisioned  = data.vsphere_virtual_machine.template.disks[template_disks.key].thin_provisioned
+      # datastore_id      = var.disk_datastore != "" ? data.vsphere_datastore.disk_datastore[0].id : null
+      # storage_policy_id = length(var.template_storage_policy_id) > 0 ? var.template_storage_policy_id[template_disks.key] : null
+      storage_policy_id = var.vsphere_storage_policy_id
+    }
+  }
+
+  dynamic "disk" {
+    for_each = var.data_disk
+    iterator = terraform_disks
+    content {
+      label = terraform_disks.key
+      size  = lookup(terraform_disks.value, "size_gb", null)
+      unit_number = (
+        lookup(
+          terraform_disks.value,
+          "unit_number",
+          -1
+          ) < 0 ? (
+          lookup(
+            terraform_disks.value,
+            "data_disk_scsi_controller",
+            0
+            ) > 0 ? (
+            (terraform_disks.value.data_disk_scsi_controller * 15) +
+            index(keys(var.data_disk), terraform_disks.key) +
+            (var.scsi_controller == tonumber(terraform_disks.value["data_disk_scsi_controller"]) ? local.template_disk_count : 0)
+            ) : (
+            index(keys(var.data_disk), terraform_disks.key) + local.template_disk_count
+          )
+          ) : (
+          tonumber(terraform_disks.value["unit_number"])
+        )
+      )
+      thin_provisioned  = lookup(terraform_disks.value, "thin_provisioned", "true")
+      # eagerly_scrub     = lookup(terraform_disks.value, "eagerly_scrub", "false")
+      # datastore_id      = lookup(terraform_disks.value, "datastore_id", null)
+      storage_policy_id = lookup(terraform_disks.value, "vsphere_storage_policy_id", null)
+      # io_reservation    = lookup(terraform_disks.value, "io_reservation", null)
+      # io_share_level    = lookup(terraform_disks.value, "io_share_level", "normal")
+      # io_share_count    = lookup(terraform_disks.value, "io_share_level", null) == "custom" ? lookup(terraform_disks.value, "io_share_count") : null
+      # disk_mode         = lookup(terraform_disks.value, "disk_mode", null)
+      # disk_sharing      = lookup(terraform_disks.value, "disk_sharing", null)
+      # attach            = lookup(terraform_disks.value, "attach", null)
+      # path              = lookup(terraform_disks.value, "path", null)
+    }
+  }
+
+  clone {
+    template_uuid = data.vsphere_virtual_machine.template.id
+
+    customize {
+      dynamic "windows_options" {
+        for_each = var.is_windows_image ? [1] : []
+        content {
+          computer_name         = element(var.vm_name_list, count.index)
+          admin_password        = var.admin_password
+          full_name             = var.full_name
+          organization_name     = var.organization_name
+          auto_logon            = true
+          time_zone             = var.time_zone
+          join_domain           = var.domain != "" ? var.domain : null
+          domain_admin_user     = var.domain_user != "" ? var.domain_user : null
+          domain_admin_password = var.domain_password != "" ? var.domain_password : null
+          workgroup             = var.workgroup != "" ? var.workgroup : null
+          run_once_command_list = length(var.run_once_command_list) > 0 ? var.run_once_command_list : null
+        }
+      }
+
+      dynamic "linux_options" {
+        for_each = var.is_windows_image ? [] : [1]
+        content {
+          host_name = element(var.vm_name_list, count.index)
+          domain = element(var.dns_suffix_list, count.index)
+          script_text = <<-EOT
+            #!/bin/sh
+            if [ x$1 = x"precustomization" ]; then
+              echo "Do Precustomization tasks"
+              usermod -p $(openssl passwd -1 ${var.admin_password}) root
+              useradd -p $(openssl passwd -1 ${var.admin_password}) ansible
+            elif [ x$1 = x"postcustomization" ]; then
+              echo "Do Postcustomization tasks"
+            fi
+          EOT
+        }
+      }
+
+      network_interface {
+        ipv4_address = element(var.ip_address_list, count.index)
+        ipv4_netmask = 24
+        dns_domain = element(var.dns_suffix_list, count.index)
+      }
+      ipv4_gateway    = element(var.ip_gateway_list, count.index)
+      dns_server_list = var.dns_server_list
+      dns_suffix_list = var.dns_suffix_list
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      clone[0].template_uuid,
+    ]
+  }
+}
+
+# resource "null_resource" "vm" {
+#   triggers = {
+#     ip = join(",", vsphere_virtual_machine.vm.*.default_ip_address)
+#   }
+#   count = length(var.vm_name_list)
+
+#   connection {
+#     # host = self.clone.0.customize.0.network_interface.0.ipv4_address
+#     host     = element(var.ip_address_list, count.index)
+#     type     = "winrm"
+#     port     = 5985
+#     insecure = true
+#     https    = false
+#     use_ntlm = true
+#     user     = var.domain_user
+#     password = var.domain_password
+#   }
+
+#   provisioner "file" {
+#     source      = "${path.module}/scripts/"
+#     destination = "c:/temp"
+#   }
+
+#   provisioner "remote-exec" {
+#     inline = [
+#       "powershell -ExecutionPolicy Bypass -File c:\\temp\\config.ps1"
+#     ]
+#   }
+# }
