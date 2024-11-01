@@ -47,23 +47,24 @@ ehthumbs_vista.db
 
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
-# Local .terraform directories
-**/.terraform/*
 
-# .tfstate files
-*.tfstate
-*.tfstate.*
-*.json
-.DS_Store
 
 # Crash log files
 crash.log
+
+# Local .terraform directories
+**/.terraform/*
 
 # Ignore any .tfvars files that are generated automatically for each Terraform run. Most
 # .tfvars files are managed as part of configuration and so should be included in
 # version control.
 #
 # example.tfvars
+
+.terraform          # Terraform cache
+*.tfstate           # a plaintext Terraform state file
+*.tfstate.backup
+*.tfstate.lock.*
 
 # Ignore override files as they are usually used to override resources locally and so
 # are not checked in
@@ -79,6 +80,5 @@ override.tf.json
 # Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
 # example: *tfplan*
 
-projects/test/
+projects/
 *.cred
-*.json
