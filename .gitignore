@@ -61,8 +61,8 @@ crash.log
 #
 # example.tfvars
 
-.terraform          # Terraform cache
-*.tfstate           # a plaintext Terraform state file
+.terraform          
+*.tfstate           
 *.tfstate.backup
 *.tfstate.lock.*
 
