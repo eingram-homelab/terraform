@@ -157,7 +157,7 @@ variable "disk_label" {
   default     = []
 }
 
-variable "disk_size_gb" {
+variable "vm_base_disk_size_gb" {
   description = "List of disk sizes to override template disk size."
   type        = list(any)
   default     = null
