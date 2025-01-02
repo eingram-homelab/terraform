@@ -1,14 +1,14 @@
-data "vault_generic_secret" "vsphere_username" {
-  path = "secret/vsphere/vcsa"
-}
+# data "vault_generic_secret" "vsphere_username" {
+#   path = "secret/vsphere/vcsa"
+# }
 
-data "vault_generic_secret" "vsphere_password" {
-  path = "secret/vsphere/vcsa"
-}
+# data "vault_generic_secret" "vsphere_password" {
+#   path = "secret/vsphere/vcsa"
+# }
 
-data "vault_generic_secret" "ssh_password" {
-  path = "secret/ssh/ansible"
-}
+# data "vault_generic_secret" "ssh_password" {
+#   path = "secret/ssh/ansible"
+# }
 
 data "vsphere_datacenter" "dc" {
   name = var.vsphere_datacenter
@@ -158,6 +158,14 @@ resource "vsphere_virtual_machine" "vm" {
               echo "Do Precustomization tasks"
               usermod -p $(openssl passwd -1 ${var.admin_password}) root
               useradd -p $(openssl passwd -1 ${var.admin_password}) ansible
+              echo 'ansible ALL=(ALL:ALL) NOPASSWD: ALL' | tee /etc/sudoers.d/ansible
+              mkdir /home/ansible/.ssh
+              chown ansible:ansible /home/ansible/.ssh
+              chmod 755 /home/ansible/.ssh
+              touch /home/ansible/.ssh/authorized_keys
+              chown ansible:ansible /home/ansible/.ssh/authorized_keys
+              chmod 600 /home/ansible/.ssh/authorized_keys
+              echo '${var.ssh_key}' >> /home/ansible/.ssh/authorized_keys
             elif [ x$1 = x"postcustomization" ]; then
               echo "Do Postcustomization tasks"
             fi
@@ -166,12 +174,12 @@ resource "vsphere_virtual_machine" "vm" {
       }
 
       network_interface {
-        ipv4_address = element(var.ip_address_list, count.index)
-        ipv4_netmask = 24
-        dns_domain = element(var.dns_suffix_list, count.index)
+        ipv4_address = length(var.ip_address_list) > 0 ? element(var.ip_address_list, count.index) : null
+        ipv4_netmask = length(var.ip_address_list) > 0 ? 24 : null
+        dns_domain = length(var.ip_address_list) > 0 ? element(var.dns_suffix_list, count.index) : null
       }
-      ipv4_gateway    = element(var.ip_gateway_list, count.index)
-      dns_server_list = var.dns_server_list
+      ipv4_gateway    = length(var.ip_address_list) > 0 ? element(var.ip_gateway_list, count.index) : null
+      dns_server_list = length(var.dns_server_list) > 0 ? var.dns_server_list : null
       dns_suffix_list = var.dns_suffix_list
     }
   }

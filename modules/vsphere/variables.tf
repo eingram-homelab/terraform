@@ -77,6 +77,12 @@ variable "ssh_password" {
   sensitive = true
 }
 
+variable "ssh_key" {
+  default   = ""
+  type      = string
+  sensitive = true
+}
+
 variable "domain_user" {
   default   = ""
   type      = string

@@ -24,6 +24,10 @@ data "vault_generic_secret" "win_password" {
   path = "secret/win/administrator"
 }
 
+data "vault_generic_secret" "ssh_pub_key" {
+  path = "secret/ssh/ansible"
+}
+
 data "vault_generic_secret" "hladmin_username" {
   path = "secret/win/homelab"
 }
@@ -47,35 +51,40 @@ module "vm" {
 
   vsphere_datastore_list = [
     "vsanDatastore",
+    "vsanDatastore",
     "vsanDatastore"
     # XN_iSCSI_SSD2,
     # XN_iSCSI_SSD2,
   ]
   vsphere_network_list = [
-    # "DPG-Lab-LAN1"
-    "DPG-Services",
-    "DPG-Services"
+    "DPG-Lab-LAN1",
+    "DPG-Lab-LAN1",
+    "DPG-Lab-LAN1"
+    # "DPG-Services",
+    # "DPG-Services"
   ]
   vm_name_list = [
-    "k3s-prod2",
-    "k3s-prod3"
+    "k3s1",
+    "k3s2",
+    "k3s3"
     # k3s2,
     # k3s3
   ]
   ip_address_list = [
-    "192.168.1.222",
-    "192.168.1.232"
+    # "192.168.1.222",
+    # "192.168.1.232"
     # 10.10.0.52,
     # 10.10.0.53
   ]
   ip_gateway_list = [
-    "192.168.1.1",
-    "192.168.1.1"
+    # "192.168.1.1",
+    # "192.168.1.1"
     # 10.10.0.1,
     # 10.10.0.1
   ]
   dns_suffix_list = [
     # "homelab.local"
+    "local.lan",
     "local.lan",
     "local.lan"
   ]
@@ -109,6 +118,7 @@ module "vm" {
   
   # Used for Windows and Linux
   admin_password = data.vault_generic_secret.win_password.data["win_password"]
+  ssh_key = data.vault_generic_secret.ssh_pub_key.data["ssh_pub_key"]
 
   # Only for Windows Workgroup to set admin user
   run_once_command_list = [
@@ -116,7 +126,7 @@ module "vm" {
     # "cmd /c powershell.exe Add-LocalGroupMember -Group 'Administrators' -Member 'ansible'"
   ]
 
-  vm_ram        = 4096
+  vm_ram        = 8192
   vm_cpu        = 2
   vm_base_disk_size_gb = [100] # Comment to use template size
   vm_efi_secure = false
@@ -129,18 +139,18 @@ module "vm" {
 
   dns_server_list = [
     # "10.10.0.10"
-    "192.168.1.250",
-    "192.168.1.251"
+    # "192.168.1.250",
+    # "192.168.1.251"
   ]
 
   data_disk = {
-    disk1 = {
-      size_gb = 100,
-      # thin_provisioned          = false,
-      # data_disk_scsi_controller = 0,
-      vsphere_storage_policy_id = "26d71bd1-1bd5-4721-9bfa-ceb3b22e2e30" # Must match vm setting
+    # disk1 = {
+    #   size_gb = 100,
+    #   # thin_provisioned          = false,
+    #   # data_disk_scsi_controller = 0,
+    #   vsphere_storage_policy_id = "26d71bd1-1bd5-4721-9bfa-ceb3b22e2e30" # Must match vm setting
 
-    }
+    # }
     # disk2 = {
     #   size_gb = 100,
     #   # thin_provisioned          = true,
