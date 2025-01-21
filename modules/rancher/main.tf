@@ -60,6 +60,7 @@ resource "rancher2_machine_config_v2" "worker_config" {
 resource "rancher2_cluster_v2" "cluster" {
   name               = var.cluster_name
   kubernetes_version = var.kubernetes_version
+  enable_network_policy = false
   
   # RKE2/K3s cluster config
   rke_config {
@@ -70,6 +71,7 @@ resource "rancher2_cluster_v2" "cluster" {
       etcd_role                   = true
       worker_role                 = var.worker_node_count > 0 ? false : true
       quantity                    = var.control_plane_node_count
+      drain_before_delete = true
 
       machine_config {
         kind = rancher2_machine_config_v2.master_config.kind
@@ -86,6 +88,7 @@ resource "rancher2_cluster_v2" "cluster" {
         etcd_role                   = false
         worker_role                 = true
         quantity                    = var.worker_node_count
+        drain_before_delete = true
 
         machine_config {
           kind = rancher2_machine_config_v2.worker_config.kind
