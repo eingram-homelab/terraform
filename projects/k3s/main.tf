@@ -1,9 +1,9 @@
-provider "google" {
-  credentials = "/terraform/creds.json"
-  gcp_project = "proj-yc-srv1"
-  gcp_region  = "us-west1"
-  gcp_zone    = "us-west1-a"
-}
+# provider "google" {
+#   credentials = "/terraform/creds.json"
+#   gcp_project = "proj-yc-srv1"
+#   gcp_region  = "us-west1"
+#   gcp_zone    = "us-west1-a"
+# }
 
 provider "vault" {
 }

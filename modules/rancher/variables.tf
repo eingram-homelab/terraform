@@ -62,6 +62,12 @@ variable "control_plane_memory" {
   # default     = 4096
 }
 
+variable "control_plane_disk_size" {
+  type        = number
+  description = "Disk size in MB for control plane nodes"
+  # default     = 61240
+}
+
 variable "worker_cpu" {
   type        = number
   description = "Number of CPUs for worker nodes"
@@ -72,6 +78,12 @@ variable "worker_memory" {
   type        = number
   description = "Memory in MB for worker nodes"
   # default     = 4096
+}
+
+variable "worker_disk_size" {
+  type        = number
+  description = "Disk size in MB for worker nodes"
+  # default     = 61240
 }
 
 # vSphere configuration variables
@@ -119,4 +131,15 @@ variable "vsphere_password" {
 variable "vsphere_vcenter" {
   type        = string
   description = "vSphere vCenter name"
+}
+
+variable "cluster_cni" {
+  type        = string
+  description = "CNI plugin to use for the cluster"
+  default     = "calico"
+}
+
+variable "disabled_features" {
+  type        = list(string)
+  description = "List of disabled features"
 }

@@ -25,13 +25,14 @@ resource "rancher2_cloud_credential" "vsphere" {
 }
 
 # Create vsphere machine config v2
-resource "rancher2_machine_config_v2" "master_config" {
-    generate_name = "test-master"
+resource "rancher2_machine_config_v2" "cp_config" {
+    generate_name = "cp"
     vsphere_config {
         clone_from = var.vsphere_template
         creation_type = "template"
         cpu_count   = var.control_plane_cpu
         memory_size = var.control_plane_memory
+        disk_size   = var.control_plane_disk_size
         datacenter  = var.vsphere_datacenter
         datastore   = var.vsphere_datastore
         folder      = var.vsphere_folder
@@ -42,12 +43,13 @@ resource "rancher2_machine_config_v2" "master_config" {
 
 # Create worker machine config v2
 resource "rancher2_machine_config_v2" "worker_config" {
-    generate_name = "test-worker"
+    generate_name = "worker"
     vsphere_config {
         clone_from = var.vsphere_template
         creation_type = "template"
         cpu_count   = var.worker_cpu
         memory_size = var.worker_memory
+        disk_size = var.worker_disk_size
         datacenter  = var.vsphere_datacenter
         datastore   = var.vsphere_datastore
         folder      = var.vsphere_folder
@@ -64,6 +66,18 @@ resource "rancher2_cluster_v2" "cluster" {
   
   # RKE2/K3s cluster config
   rke_config {
+    machine_global_config = yamlencode({
+      "disable" = length(var.disabled_features) > 0 ? var.disabled_features : []
+      # cni = var.cluster_cni
+      enable-controller-manager-metrics = true  
+      etcd-expose-metrics            = true
+
+    })
+
+    # registries {
+    #   system_default_registry = "docker.io"
+    # }
+
     machine_pools {
       name                         = "control-plane"
       cloud_credential_secret_name = rancher2_cloud_credential.vsphere.id
@@ -74,8 +88,8 @@ resource "rancher2_cluster_v2" "cluster" {
       drain_before_delete = true
 
       machine_config {
-        kind = rancher2_machine_config_v2.master_config.kind
-        name = rancher2_machine_config_v2.master_config.name
+        kind = rancher2_machine_config_v2.cp_config.kind
+        name = rancher2_machine_config_v2.cp_config.name
       }
     }
 
