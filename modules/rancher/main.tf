@@ -38,6 +38,7 @@ resource "rancher2_machine_config_v2" "cp_config" {
         folder      = var.vsphere_folder
         network     = var.vsphere_network
         pool        = var.vsphere_resource_pool
+        tags        = var.vsphere_tags
     }
 }
 

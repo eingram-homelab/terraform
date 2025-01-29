@@ -37,6 +37,11 @@ variable "vsphere_cloud_credential_name" {
   description = "Name of the vSphere cloud credential secret in Rancher"
 }
 
+variable "vsphere_tags" {
+  type        = list(string)
+  description = "List of tags to apply to the VMs"
+}
+
 # Node configuration variables
 variable "control_plane_node_count" {
   type        = number

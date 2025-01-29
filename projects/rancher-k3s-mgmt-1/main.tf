@@ -41,4 +41,5 @@ module "rancher" {
   vsphere_cloud_credential_name = "vsphere"
   # cluster_cni = "flannel"
   disabled_features = ["servicelb"]
+  vsphere_tags = ["dev"]
 }
