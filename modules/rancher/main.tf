@@ -111,28 +111,5 @@ resource "rancher2_cluster_v2" "cluster" {
         }
       }
     }
-    # machine_pools {
-    #   name                         = "worker"
-    #   cloud_credential_secret_name = var.vsphere_cloud_credential_name
-    #   control_plane_role          = false
-    #   etcd_role                   = false
-    #   worker_role                 = true
-    #   quantity                    = var.worker_node_count
-
-    #   machine_config {
-    #     kind = rancher2_machine_config_v2.worker_config.kind
-    #     name = rancher2_machine_config_v2.worker_config.name
-    #   }
-    # }
   }
-}
-
-# Output the cluster ID and kube_config
-output "cluster_id" {
-  value = rancher2_cluster_v2.cluster.id
-}
-
-output "kube_config" {
-  value     = rancher2_cluster_v2.cluster.kube_config
-  sensitive = true
 }
