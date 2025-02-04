@@ -1,0 +1,102 @@
+{
+  "version": 4,
+  "terraform_version": "1.5.7",
+  "serial": 4,
+  "lineage": "215debd0-8b21-e7a9-c24e-dbffc3262d74",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "data",
+      "type": "vault_generic_secret",
+      "name": "secret",
+      "provider": "provider[\"registry.terraform.io/hashicorp/vault\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "data": {
+              "secret": "hlzkcjrv5ckdb6kfv6sc6mw7whz6wqb86hmtkxcfqnrms7qjjpp69b",
+              "token": "token-pvgm4"
+            },
+            "data_json": "{\"secret\":\"hlzkcjrv5ckdb6kfv6sc6mw7whz6wqb86hmtkxcfqnrms7qjjpp69b\",\"token\":\"token-pvgm4\"}",
+            "id": "secret/rancher",
+            "lease_duration": 2764800,
+            "lease_id": "",
+            "lease_renewable": false,
+            "lease_start_time": "2025-02-03T08:01:19Z",
+            "namespace": null,
+            "path": "secret/rancher",
+            "version": -1,
+            "with_lease_start_time": true
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "vault_generic_secret",
+      "name": "token",
+      "provider": "provider[\"registry.terraform.io/hashicorp/vault\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "data": {
+              "secret": "hlzkcjrv5ckdb6kfv6sc6mw7whz6wqb86hmtkxcfqnrms7qjjpp69b",
+              "token": "token-pvgm4"
+            },
+            "data_json": "{\"secret\":\"hlzkcjrv5ckdb6kfv6sc6mw7whz6wqb86hmtkxcfqnrms7qjjpp69b\",\"token\":\"token-pvgm4\"}",
+            "id": "secret/rancher",
+            "lease_duration": 2764800,
+            "lease_id": "",
+            "lease_renewable": false,
+            "lease_start_time": "2025-02-03T08:01:19Z",
+            "namespace": null,
+            "path": "secret/rancher",
+            "version": -1,
+            "with_lease_start_time": true
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "vault_generic_secret",
+      "name": "vsphere_password",
+      "provider": "provider[\"registry.terraform.io/hashicorp/vault\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "data": {
+              "vsphere_password": "B0Cadence\u0026",
+              "vsphere_username": "administrator@vsphere.local"
+            },
+            "data_json": "{\"vsphere_password\":\"B0Cadence\\u0026\",\"vsphere_username\":\"administrator@vsphere.local\"}",
+            "id": "secret/vsphere/vcsa",
+            "lease_duration": 2764800,
+            "lease_id": "",
+            "lease_renewable": false,
+            "lease_start_time": "2025-02-03T08:01:19Z",
+            "namespace": null,
+            "path": "secret/vsphere/vcsa",
+            "version": -1,
+            "with_lease_start_time": true
+          },
+          "sensitive_attributes": []
+        }
+      ]
+    },
+    {
+      "module": "module.rancher",
+      "mode": "managed",
+      "type": "rancher2_cluster_v2",
+      "name": "cluster",
+      "provider": "module.rancher.provider[\"registry.terraform.io/rancher/rancher2\"]",
+      "instances": []
+    }
+  ],
+  "check_results": null
+}
