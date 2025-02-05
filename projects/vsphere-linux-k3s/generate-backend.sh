@@ -1,9 +1,11 @@
 #!/bin/bash
 
-cat <<EOF > backend.hcl
+cat <<EOF > backend.tf
 terraform {
-    bucket      = "yc-srv1-tfstate"
-    credentials = ${TF_VAR_GCP_cred} 
-    prefix      = "terraform/state/${PWD##*/}"
+    backend "gcs" {
+        bucket      = "yc-srv1-tfstate"
+        credentials = ${TF_VAR_GCP_BUCKET_TFSTATE_cred} 
+        prefix      = "terraform/state/${PWD##*/}"
+    }
 }
 EOF
