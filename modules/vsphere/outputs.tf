@@ -1,14 +1,14 @@
-output "VM" {
+output "name" {
   description = "VM Names"
   value       = vsphere_virtual_machine.vm.*.name
 }
 
-output "ip" {
+output "default_ip_address" {
   description = "default ip address of the deployed VM"
   value       = vsphere_virtual_machine.vm.*.default_ip_address
 }
 
-output "guest-ip" {
+output "guest_ip_addresses" {
   description = "all the registered ip address of the VM"
   value       = vsphere_virtual_machine.vm.*.guest_ip_addresses
 }

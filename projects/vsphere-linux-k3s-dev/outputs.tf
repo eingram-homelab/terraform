@@ -1,24 +1,24 @@
-output "VM" {
+output "name" {
   description = "VM Names"
-  value       = module.vm.*.name
+  value       = module.vm.name
 }
 
-output "ip" {
+output "default_ip_address" {
   description = "default ip address of the deployed VM"
-  value       = module.vm.*.default_ip_address
+  value       = module.vm.default_ip_address
 }
 
-output "guest-ip" {
+output "guest_ip_addresses" {
   description = "all the registered ip address of the VM"
-  value       = module.vm.*.guest_ip_addresses
+  value       = module.vm.guest_ip_addresses
 }
 
 output "uuid" {
   description = "UUID of the VM in vSphere"
-  value       = module.vm.*.uuid
+  value       = module.vm.uuid
 }
 
 output "disk" {
   description = "Disks of the deployed VM"
-  value       = module.vm.*.disk
+  value       = module.vm.disk
 }

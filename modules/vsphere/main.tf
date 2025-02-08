@@ -1,15 +1,3 @@
-# data "vault_generic_secret" "vsphere_username" {
-#   path = "secret/vsphere/vcsa"
-# }
-
-# data "vault_generic_secret" "vsphere_password" {
-#   path = "secret/vsphere/vcsa"
-# }
-
-# data "vault_generic_secret" "ssh_password" {
-#   path = "secret/ssh/ansible"
-# }
-
 data "vsphere_datacenter" "dc" {
   name = var.vsphere_datacenter
 }

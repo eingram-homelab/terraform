@@ -1,10 +1,3 @@
-# provider "google" {
-#   credentials = "/terraform/creds.json"
-#   gcp_project = "proj-yc-srv1"
-#   gcp_region  = "us-west1"
-#   gcp_zone    = "us-west1-a"
-# }
-
 provider "vault" {
 }
 
@@ -64,9 +57,9 @@ module "vm" {
     # "DPG-Services"
   ]
   vm_name_list = [
-    "k3s1",
-    "k3s2",
-    "k3s3"
+    "k3s-dev-cp1",
+    "k3s-dev-worker1",
+    "k3s-dev-worker2"
     # k3s2,
     # k3s3
   ]
@@ -93,7 +86,7 @@ module "vm" {
 
   # Linux images
   # vsphere_template = TMP-RHEL85_Packer
-  vsphere_template = "TMP-Rocky9_Packer"
+  vsphere_template = "TMP-Rocky9_Packer_RKE2"
 
   # Windows images
   # vsphere_template = "TMP-Win2022Core_Packer"
@@ -104,7 +97,7 @@ module "vm" {
   is_windows_image = false
 
   # Set vm folder location
-  vm_folder_name = "Linux"
+  vm_folder_name = "Rancher"
   # vm_folder_name = "WindowsWG"
   # vm_folder_name = "WindowsHL"
 
