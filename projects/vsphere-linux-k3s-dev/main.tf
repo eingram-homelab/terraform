@@ -84,6 +84,14 @@ module "vm" {
 
   # Global options apply to all VMs
 
+  vm_tag_categories = [
+    "Environment"
+  ]
+
+  vm_tags = [
+    "dev"
+  ]
+  
   # Linux images
   # vsphere_template = TMP-RHEL85_Packer
   vsphere_template = "TMP-Rocky9_Packer_RKE2"
@@ -125,7 +133,8 @@ module "vm" {
   vm_efi_secure = false
 
   # vSAN - No Fault Tolerance - Comment for Fault Tolerance (will use default for datastore)
-  vsphere_storage_policy_id = "26d71bd1-1bd5-4721-9bfa-ceb3b22e2e30"
+  # vsphere_storage_policy_id = "26d71bd1-1bd5-4721-9bfa-ceb3b22e2e30"
+  vm_storage_policy = "vSAN - No Fault Tolerance"
 
   # VMFS Thin Provisioned
   # vsphere_storage_policy_id = "991380e9-8714-4ec0-9c8c-944aa740e8a8"

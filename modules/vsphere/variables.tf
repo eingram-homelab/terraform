@@ -20,10 +20,16 @@ variable "vsphere_datastore_list" {
     type = list(any)
 }
 
-variable "vsphere_storage_policy_id" {
+variable "vm_storage_policy" {
   default = ""
 }
 
+variable "vm_tag_categories" {
+  type = list(string)
+}
+variable "vm_tags" {
+  type = list(string)
+}
 variable "vsphere_template" {
   default = ""
 }

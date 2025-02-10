@@ -8,6 +8,9 @@ data "vsphere_datastore" "datastore" {
   datacenter_id = data.vsphere_datacenter.dc.id
 }
 
+data "vsphere_storage_policy" "storage_policy" {
+  name = var.vm_storage_policy
+}
 data "vsphere_datastore" "disk_datastore" {
   count         = var.disk_datastore != "" ? 1 : 0
   name          = var.disk_datastore
@@ -30,8 +33,17 @@ data "vsphere_virtual_machine" "template" {
   datacenter_id = data.vsphere_datacenter.dc.id
 }
 
+data "vsphere_tag_category" "category" {
+  count = length(var.vm_tag_categories)
+  name  = element(var.vm_tag_categories, count.index)
+}
+data "vsphere_tag" "tag" {
+  count = length(var.vm_tags)
+  name  = element(var.vm_tags, count.index)
+  category_id = data.vsphere_tag_category.category[count.index].id
+}
 locals {
-  # interface_count     = length(var.ipv4submask) #Used for Subnet handeling
+  # interface_count     = length(var.ipv4submask) #Used for Subnet handling
   template_disk_count = length(data.vsphere_virtual_machine.template.disks)
 }
 
@@ -40,19 +52,18 @@ resource "vsphere_virtual_machine" "vm" {
   count = length(var.vm_name_list)
   name  = element(var.vm_name_list, count.index)
 
-  resource_pool_id  = data.vsphere_compute_cluster.cluster.resource_pool_id
-  datastore_id      = data.vsphere_datastore.datastore[count.index].id
-  storage_policy_id = var.vsphere_storage_policy_id
-  folder            = "/HomeLab Datacenter/vm/${var.vm_folder_name}"
-  firmware          = "efi"
+  resource_pool_id        = data.vsphere_compute_cluster.cluster.resource_pool_id
+  datastore_id            = data.vsphere_datastore.datastore[count.index].id
+  storage_policy_id       = data.vsphere_storage_policy.storage_policy.id
+  folder                  = "/HomeLab Datacenter/vm/${var.vm_folder_name}"
+  firmware                = "efi"
   efi_secure_boot_enabled = var.vm_efi_secure
-
-  num_cpus           = var.vm_cpu
-  memory             = var.vm_ram
-  memory_reservation = var.vm_ram
-  guest_id           = data.vsphere_virtual_machine.template.guest_id
-
-  scsi_type = data.vsphere_virtual_machine.template.scsi_type
+  tags                    = data.vsphere_tag.tag[*].id
+  num_cpus                = var.vm_cpu
+  memory                  = var.vm_ram
+  memory_reservation      = var.vm_ram
+  guest_id                = data.vsphere_virtual_machine.template.guest_id
+  scsi_type               = data.vsphere_virtual_machine.template.scsi_type
 
   network_interface {
     network_id   = data.vsphere_network.network[count.index].id
@@ -68,8 +79,7 @@ resource "vsphere_virtual_machine" "vm" {
       unit_number       = var.scsi_controller != null ? var.scsi_controller * 15 + template_disks.key : template_disks.key
       thin_provisioned  = data.vsphere_virtual_machine.template.disks[template_disks.key].thin_provisioned
       # datastore_id      = var.disk_datastore != "" ? data.vsphere_datastore.disk_datastore[0].id : null
-      # storage_policy_id = length(var.template_storage_policy_id) > 0 ? var.template_storage_policy_id[template_disks.key] : null
-      storage_policy_id = var.vsphere_storage_policy_id
+      storage_policy_id = data.vsphere_storage_policy.storage_policy.id
     }
   }
 
