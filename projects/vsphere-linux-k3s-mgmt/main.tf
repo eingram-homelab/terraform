@@ -43,23 +43,23 @@ module "vm" {
   # All lists must have same # of elements
 
   vsphere_datastore_list = [
+    "vsanDatastore",
+    "vsanDatastore",
     "vsanDatastore"
-    # "vsanDatastore",
-    # "vsanDatastore"
     # XN_iSCSI_SSD2,
     # XN_iSCSI_SSD2,
   ]
   vsphere_network_list = [
+    "DPG-Lab-LAN1",
+    "DPG-Lab-LAN1",
     "DPG-Lab-LAN1"
-    # "DPG-Lab-LAN1",
-    # "DPG-Lab-LAN1"
     # "DPG-Services",
     # "DPG-Services"
   ]
   vm_name_list = [
-    "k3s-mgmt-cp1"
-    # "k3s-dev-worker1",
-    # "k3s-dev-worker2"
+    "k3s-mgmt-cp1",
+    "k3s-mgmt-worker1",
+    "k3s-mgmt-worker2"
     # k3s2,
     # k3s3
   ]
@@ -75,14 +75,13 @@ module "vm" {
     # 10.10.0.1,
     # 10.10.0.1
   ]
-  dns_suffix_list = [
-    # "homelab.local"
-    # "local.lan",
-    # "local.lan",
-    "local.lan"
-  ]
 
   # Global options apply to all VMs
+
+  dns_suffix_list = [
+    # "homelab.local"
+    "local.lan"
+  ]
 
   vm_tag_categories = [
     "Environment"
