@@ -64,6 +64,10 @@ resource "vsphere_virtual_machine" "vm" {
   memory_reservation      = var.vm_ram
   guest_id                = data.vsphere_virtual_machine.template.guest_id
   scsi_type               = data.vsphere_virtual_machine.template.scsi_type
+  hardware_version        = data.vsphere_virtual_machine.template.hardware_version
+  extra_config = {
+    "disk.EnableUUID" = var.vsphere_csi ? "true" : "false"
+  }
 
   network_interface {
     network_id   = data.vsphere_network.network[count.index].id

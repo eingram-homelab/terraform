@@ -207,3 +207,7 @@ variable "run_once_command_list" {
   type        = list
   default     = []
 }
+
+variable "vsphere_csi" {
+  default = false
+}
