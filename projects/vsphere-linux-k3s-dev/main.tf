@@ -37,7 +37,7 @@ provider "vsphere" {
 }
 
 module "vm" {
-  source = "../../modules/vsphere"
+  source = "../../modules/vsphere/vm"
 
   # Set one per VM
   # All lists must have same # of elements
@@ -133,8 +133,12 @@ module "vm" {
   vm_efi_secure = false
   
   # Set this config for k8s nodes using vSphere CSI
-  vsphere_csi = true
+  enable_disk_uuid = true
   
+  vm_user_id = "vsphere.local\\csi"
+  vm_role_name = "CNS-VM"
+  vm_permissions_propagate = false
+
   # vSAN - No Fault Tolerance - Comment for Fault Tolerance (will use default for datastore)
   # vsphere_storage_policy_id = "26d71bd1-1bd5-4721-9bfa-ceb3b22e2e30"
   vm_storage_policy = "vSAN - No Fault Tolerance"
