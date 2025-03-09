@@ -208,6 +208,24 @@ variable "run_once_command_list" {
   default     = []
 }
 
-variable "vsphere_csi" {
+variable "enable_disk_uuid" {
   default = false
+}
+
+variable "vm_role_name" {
+  description = "The name of the vSphere role to assign to the user"
+  type        = string
+  default     = ""  # Empty default, permission will only be created if a value is provided
+}
+
+variable "vm_user_id" {
+  description = "The user ID to grant permissions to (format: user@domain or domain\\user)"
+  type        = string
+  default     = ""  # Empty default, permission will only be created if a value is provided
+}
+
+variable "vm_permissions_propagate" {
+  description = "Whether to propagate the permission to child objects"
+  type        = bool
+  default     = false
 }

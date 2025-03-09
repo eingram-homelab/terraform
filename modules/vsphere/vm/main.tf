@@ -37,11 +37,13 @@ data "vsphere_tag_category" "category" {
   count = length(var.vm_tag_categories)
   name  = element(var.vm_tag_categories, count.index)
 }
+
 data "vsphere_tag" "tag" {
   count = length(var.vm_tags)
   name  = element(var.vm_tags, count.index)
   category_id = data.vsphere_tag_category.category[count.index].id
 }
+
 locals {
   # interface_count     = length(var.ipv4submask) #Used for Subnet handling
   template_disk_count = length(data.vsphere_virtual_machine.template.disks)
@@ -65,9 +67,7 @@ resource "vsphere_virtual_machine" "vm" {
   guest_id                = data.vsphere_virtual_machine.template.guest_id
   scsi_type               = data.vsphere_virtual_machine.template.scsi_type
   hardware_version        = data.vsphere_virtual_machine.template.hardware_version
-  extra_config = {
-    "disk.EnableUUID" = var.vsphere_csi ? "true" : "false"
-  }
+  enable_disk_uuid        = var.enable_disk_uuid ? "true" : "false"
 
   network_interface {
     network_id   = data.vsphere_network.network[count.index].id
@@ -193,32 +193,19 @@ resource "vsphere_virtual_machine" "vm" {
   }
 }
 
-# resource "null_resource" "vm" {
-#   triggers = {
-#     ip = join(",", vsphere_virtual_machine.vm.*.default_ip_address)
-#   }
-#   count = length(var.vm_name_list)
+data "vsphere_role" "vm_role" {
+  label = var.vm_role_name
+}
 
-#   connection {
-#     # host = self.clone.0.customize.0.network_interface.0.ipv4_address
-#     host     = element(var.ip_address_list, count.index)
-#     type     = "winrm"
-#     port     = 5985
-#     insecure = true
-#     https    = false
-#     use_ntlm = true
-#     user     = var.domain_user
-#     password = var.domain_password
-#   }
+resource "vsphere_entity_permissions" "vm_permission" {
+  count       = var.vm_user_id != "" ? length(var.vm_name_list) : 0
+  entity_id   = vsphere_virtual_machine.vm[count.index].id
+  entity_type = "VirtualMachine"
+  permissions {
+    user_or_group = var.vm_user_id
+    is_group      = false
+    role_id       = data.vsphere_role.vm_role.id
+    propagate     = var.vm_permissions_propagate
+  }
+}
 
-#   provisioner "file" {
-#     source      = "${path.module}/scripts/"
-#     destination = "c:/temp"
-#   }
-
-#   provisioner "remote-exec" {
-#     inline = [
-#       "powershell -ExecutionPolicy Bypass -File c:\\temp\\config.ps1"
-#     ]
-#   }
-# }
