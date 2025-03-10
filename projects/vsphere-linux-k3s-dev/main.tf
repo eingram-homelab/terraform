@@ -132,9 +132,8 @@ module "vm" {
   vm_base_disk_size_gb = [100] # Comment to use template size
   vm_efi_secure = false
   
-  # Set this config for k8s nodes using vSphere CSI
+  # Set these options for k8s nodes using vSphere CSI
   enable_disk_uuid = true
-  
   vm_user_id = "vsphere.local\\csi"
   vm_role_name = "CNS-VM"
   vm_permissions_propagate = false
