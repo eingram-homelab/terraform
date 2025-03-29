@@ -31,7 +31,7 @@ variable "vm_tags" {
   type = list(string)
 }
 variable "vsphere_template" {
-  default = ""
+  type = string
 }
 
 variable "vm_folder_name" {
