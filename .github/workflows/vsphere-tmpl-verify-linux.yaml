@@ -31,12 +31,12 @@ jobs:
 
       - name: Run terraform init
         run: |
-          cd terraform/projects/vsphere-tmpl-verify
+          cd projects/vsphere-tmpl-verify
           terraform init 
 
       - name: Run terraform apply
         run: |
-          cd terraform/projects/vsphere-tmpl-verify
+          cd projects/vsphere-tmpl-verify
           terraform apply -auto-approve
 
       - name: Test VM network connectivity
