@@ -55,7 +55,7 @@ jobs:
       - name: Test VM network connectivity
         id: ping
         run: |
-          sudo apt-get install -y iputils-ping
+          sudo apt-get update && sudo apt-get install -y iputils-ping
           ping -c 4 "$(terraform output -raw default_ip_address)"
           if [ $? -eq 0 ]; then
             echo "VM is reachable"
