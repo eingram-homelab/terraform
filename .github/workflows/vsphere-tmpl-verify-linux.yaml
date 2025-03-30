@@ -42,15 +42,15 @@ jobs:
         run: |
           echo ${{ secrets.GCP_STORAGE }} | base64 --decode > /tmp/cred.json
 
-      - name: Run terraform init and apply
+      - name: Run terraform init
         run: |
           cd projects/vsphere-tmpl-verify
-          terraform init && terraform apply -auto-approve
+          terraform init
 
-      # - name: Run terraform apply
-      #   run: |
-      #     cd projects/vsphere-tmpl-verify
-      #     terraform apply -auto-approve
+      - name: Run terraform apply
+        run: |
+          cd projects/vsphere-tmpl-verify
+          terraform apply -auto-approve
 
       - name: Test VM network connectivity
         run: |
