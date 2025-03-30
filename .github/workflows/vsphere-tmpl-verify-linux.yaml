@@ -13,11 +13,12 @@ on:
 
 jobs:
   validate_and_apply:
-    name: Validate Packer Templates on vSphere
+    name: Validate Packer Templates on vSphere using Terraform
     runs-on: arc-runners
     env:
       TF_VAR_vm_template: TMP-Rocky9_Packer_RKE2_2025_03_24
       TF_VAR_vm_name_list: '["linux-test"]'
+      TF_VAR_GCP_BUCKET_TFSTATE_cred: /tmp/creds.json
       VAULT_ADDR: ${{ vars.VAULT_ADDR}}
       VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
     steps:
@@ -35,6 +36,10 @@ jobs:
         uses: hashicorp/setup-terraform@main
         with:
           terraform_version: 1.11.3
+
+      - name: Create json cred file
+        run: |
+          echo ${{ secrets.JSON_CRED }} | base64 --decode > /tmp/creds.json
 
       - name: Run terraform init
         run: |
