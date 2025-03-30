@@ -1,0 +1,52 @@
+name: Terraform Validate New Template
+
+on:
+  # push:
+  #   branches: [ develop ]
+  #   paths:
+  #     - '**.pkr.hcl'
+  # pull_request:
+  #   branches: [ develop ]
+  #   paths:
+  #     - '**.pkr.hcl'
+  workflow_dispatch:
+
+jobs:
+  validate_and_apply:
+    name: Validate Packer Templates on vSphere
+    runs-on: arc-runners
+    env:
+      TF_VAR_vm_template: $TMPL_NAME
+      TF_VAR_vm_name_list: '["linux-test"]'
+      VAULT_ADDR: ${{ vars.VAULT_ADDR}}
+      VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@main
+        with:
+          version: "latest"
+
+      - name: Run terraform init
+        run: |
+          cd projects/vsphere-tmpl-verify
+          terraform init 
+
+      - name: Run terraform apply
+        run: |
+          cd projects/vsphere-tmpl-verify
+          terraform apply -auto-approve
+
+      - name: Test VM network connectivity
+        run: |
+          ping -c 4 "$(terraform output -raw default_ip_address)"
+          if [ $? -eq 0 ]; then
+            echo "VM is reachable"
+          else
+            echo "VM is not reachable"
+            exit 1
+          fi
+
+          
