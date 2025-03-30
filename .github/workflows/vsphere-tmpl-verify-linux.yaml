@@ -27,16 +27,16 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@main
         with:
-          version: "latest"
+          terraform_version: 1.11.3
 
       - name: Run terraform init
         run: |
-          cd projects/vsphere-tmpl-verify
+          cd terraform/projects/vsphere-tmpl-verify
           terraform init 
 
       - name: Run terraform apply
         run: |
-          cd projects/vsphere-tmpl-verify
+          cd terraform/projects/vsphere-tmpl-verify
           terraform apply -auto-approve
 
       - name: Test VM network connectivity
