@@ -18,7 +18,6 @@ jobs:
     env:
       TF_VAR_vm_template: TMP-Rocky9_Packer_RKE2_2025_03_24
       TF_VAR_vm_name_list: '["linux-test"]'
-      TF_VAR_GCP_BUCKET_TFSTATE_cred: /tmp/creds.json
       VAULT_ADDR: ${{ vars.VAULT_ADDR}}
       VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
     steps:
