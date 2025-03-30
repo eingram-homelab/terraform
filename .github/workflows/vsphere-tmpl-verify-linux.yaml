@@ -38,7 +38,7 @@ jobs:
 
       - name: Create json cred file
         run: |
-          echo ${{ secrets.JSON_CRED }} | base64 --decode > /tmp/cred.json
+          echo ${{ secrets.GCP_STORAGE }} | base64 --decode > /tmp/cred.json
 
       - name: Run terraform init
         run: |
