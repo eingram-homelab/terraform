@@ -16,7 +16,7 @@ jobs:
     name: Validate Packer Templates on vSphere
     runs-on: arc-runners
     env:
-      TF_VAR_vm_template: $TMPL_NAME
+      TF_VAR_vm_template: TMP-Rocky9_Packer_RKE2_2025_03_24
       TF_VAR_vm_name_list: '["linux-test"]'
       VAULT_ADDR: ${{ vars.VAULT_ADDR}}
       VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
