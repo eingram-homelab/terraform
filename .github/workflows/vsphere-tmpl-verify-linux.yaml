@@ -16,7 +16,7 @@ jobs:
     name: Validate Packer Templates on vSphere using Terraform
     runs-on: arc-runners
     env:
-      TF_VAR_vm_template: "TMP-Rocky9_Packer_RKE2_2025_03_24"
+      TF_VAR_vsphere_template: "TMP-Rocky9_Packer_RKE2_2025_03_24"
       TF_VAR_vm_name_list: '["linux-test"]'
       TF_VAR_vm_folder_name: "Test"
       TF_VAR_is_windows_image: false
