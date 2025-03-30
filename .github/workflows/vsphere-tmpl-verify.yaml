@@ -10,16 +10,20 @@ on:
   #   paths:
   #     - '**.pkr.hcl'
   workflow_dispatch:
+    inputs:
+      TMPL_NAME:
+        description: 'The VSphere template name'
+        required: true
 
 jobs:
   validate_and_apply:
     name: Validate Packer Templates on vSphere using Terraform
     runs-on: arc-runners
     env:
-      TF_VAR_vsphere_template: "$TMPL_NAME"
+      TF_VAR_vsphere_template: "${{ github.event.inputs.TMPL_NAME }}"
       TF_VAR_vm_name_list: '["gha-vm-test-$(date +%Y%m%d%H%M%S)"]'
       TF_VAR_vm_folder_name: "Test"
-      TF_VAR_is_windows_image: "${{ contains(TMPL_NAME, 'Win') && true || false }}"
+      TF_VAR_is_windows_image: "${{ contains(github.event.inputs.TMPL_NAME, 'Win') && true || false }}"
       VAULT_ADDR: ${{ vars.VAULT_ADDR }}
       VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
     steps:
