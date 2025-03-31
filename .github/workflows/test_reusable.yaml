@@ -13,7 +13,5 @@ jobs:
     runs-on: arc-runners
     steps:
       - name: Print input variable
-        with:
-          test_var: ${{ inputs.input_var }}
         run: |
-          echo "Input variable from calling workflow: ${{ test_var }}"
+          echo "Input variable from calling workflow: ${{ inputs.input_var }}"
