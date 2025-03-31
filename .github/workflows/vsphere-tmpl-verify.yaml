@@ -35,6 +35,9 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+        with:
+          repository: eingram-homelab/terraform
+          ref: main
 
     # When running on self-hosted GitHub Actions runners,
     # NodeJS must be previously installed with the version specified in the action.yml.
