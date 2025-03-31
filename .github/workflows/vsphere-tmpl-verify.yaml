@@ -1,19 +1,6 @@
 name: Terraform Validate New Template
 
 on:
-  # push:
-  #   branches: [ develop ]
-  #   paths:
-  #     - '**.pkr.hcl'
-  # pull_request:
-  #   branches: [ develop ]
-  #   paths:
-  #     - '**.pkr.hcl'
-  # workflow_dispatch:
-  #   inputs:
-  #     TMPL_NAME:
-  #       description: 'The VSphere template name'
-  #       required: true
   workflow_call:
     inputs:
       TMPL_NAME:
@@ -26,17 +13,16 @@ jobs:
     name: Validate Packer Templates on vSphere using Terraform
     runs-on: arc-runners
     env:
-      TF_VAR_vsphere_template: "${{ github.event.inputs.TMPL_NAME }}"
-      TF_VAR_vm_name_list: '["gha-vm-test-$(date +%Y%m%d%H%M%S)"]'
+      TF_VAR_vsphere_template: "${{ inputs.TMPL_NAME }}"
+      TF_VAR_vm_name_list: '["gha-vm-test"]'
       TF_VAR_vm_folder_name: "Test"
-      TF_VAR_is_windows_image: "${{ contains(github.event.inputs.TMPL_NAME, 'Win') && true || false }}"
+      TF_VAR_is_windows_image: "${{ contains(inputs.TMPL_NAME, 'Win') && true || false }}"
       VAULT_ADDR: ${{ vars.VAULT_ADDR }}
       VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
         with:
-          vsphere_template: ${{ inputs.TMPL_NAME }}
           repository: eingram-homelab/terraform
           ref: main
 
@@ -78,11 +64,9 @@ jobs:
             echo "VM is not reachable"
             exit 1
           fi
-      
+    
       - name: Destroy Test VM
         if: steps.ping.outcome == 'success'
         run: |
           cd projects/vsphere-tmpl-verify
           terraform destroy --auto-approve
-
-          
