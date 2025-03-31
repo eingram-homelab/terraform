@@ -1,0 +1,17 @@
+name: Test reusable workflow
+
+on:
+  workflow_call:
+    inputs:
+      input_var:
+        description: 'Input variable from the calling workflow'
+        required: true
+        type: string
+
+jobs:
+  test_job:
+    runs-on: arc-runners
+    steps:
+      - name: Print input variable
+        run: |
+          echo "Input variable from calling workflow: ${{ inputs.input_var }}"
