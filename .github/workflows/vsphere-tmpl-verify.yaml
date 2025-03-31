@@ -9,11 +9,17 @@ on:
   #   branches: [ develop ]
   #   paths:
   #     - '**.pkr.hcl'
-  workflow_dispatch:
+  # workflow_dispatch:
+  #   inputs:
+  #     TMPL_NAME:
+  #       description: 'The VSphere template name'
+  #       required: true
+  workflow_call:
     inputs:
       TMPL_NAME:
         description: 'The VSphere template name'
         required: true
+        type: string
 
 jobs:
   validate_and_apply:
