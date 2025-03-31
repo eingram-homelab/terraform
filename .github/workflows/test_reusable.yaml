@@ -14,4 +14,4 @@ jobs:
     steps:
       - name: Print input variable
         run: |
-          echo "Input variable from calling workflow: ${{ github.events.inputs.input_var }}"
+          echo "Input variable from calling workflow: ${{ inputs.input_var }}"
