@@ -26,7 +26,7 @@ jobs:
       VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: eingram-homelab/terraform
           ref: main
@@ -34,7 +34,7 @@ jobs:
     # When running on self-hosted GitHub Actions runners,
     # NodeJS must be previously installed with the version specified in the action.yml.
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
