@@ -39,6 +39,7 @@ resource "rancher2_machine_config_v2" "cp_config" {
         network     = var.vsphere_network
         pool        = var.vsphere_resource_pool
         tags        = var.vsphere_tags
+        cfgparam    = var.vsphere_cfgparam
     }
 }
 
@@ -79,18 +80,21 @@ resource "rancher2_cluster_v2" "cluster" {
     #   system_default_registry = "docker.io"
     # }
 
-    machine_pools {
-      name                         = "control-plane"
-      cloud_credential_secret_name = rancher2_cloud_credential.vsphere.id
-      control_plane_role          = true
-      etcd_role                   = true
-      worker_role                 = var.worker_node_count > 0 ? false : true
-      quantity                    = var.control_plane_node_count
-      drain_before_delete = true
+    dynamic "machine_pools" {
+      for_each = var.control_plane_node_count > 0 ? [1] : []
+      content {
+        name                         = "cp"
+        cloud_credential_secret_name = rancher2_cloud_credential.vsphere.id
+        control_plane_role          = true
+        etcd_role                   = true
+        worker_role                 = var.worker_node_count > 0 ? false : true
+        quantity                    = var.control_plane_node_count
+        drain_before_delete = true
 
-      machine_config {
-        kind = rancher2_machine_config_v2.cp_config.kind
-        name = rancher2_machine_config_v2.cp_config.name
+        machine_config {
+          kind = rancher2_machine_config_v2.cp_config.kind
+          name = rancher2_machine_config_v2.cp_config.name
+        }
       }
     }
 

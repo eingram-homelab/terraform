@@ -148,3 +148,9 @@ variable "disabled_features" {
   type        = list(string)
   description = "List of disabled features"
 }
+
+variable "vsphere_cfgparam" {
+  type        = list(string)
+  description = "vSphere configuration parameters"
+  default     = []
+}
