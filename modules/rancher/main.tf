@@ -40,7 +40,17 @@ resource "rancher2_machine_config_v2" "cp_config" {
         pool        = var.vsphere_resource_pool
         tags        = var.vsphere_tags
         cfgparam    = var.vsphere_cfgparam
-    }
+        cloud_config = <<EOF
+        users:
+          - name: root
+          lock-passwd: false
+          passwd: ${var.salt_password}
+          - name: ansible
+            primary_group: ansible
+            ssh_authorized_keys:
+              - ${var.ssh_key}
+        EOF
+        }
 }
 
 # Create worker machine config v2

@@ -13,6 +13,14 @@ data "vault_generic_secret" "vsphere_password" {
   path = "secret/vsphere/vcsa"
 }
 
+data "vault_generic_secret" "salt_password" {
+  path = "secret/ssh/eingram"
+}
+
+data "vault_generic_secret" "ssh_pub_key" {
+  path = "secret/ssh/eingram"
+}
+
 module "rancher" {
   source = "../../modules/rancher"
   rancher_api_url = "https://rancher.local.lan"
@@ -43,4 +51,6 @@ module "rancher" {
   disabled_features = ["servicelb", "traefik"]
   vsphere_tags = ["dev"]
   vsphere_cfgparam = ["disk.enableUUID=TRUE"]
+  salt_password = data.vault_generic_secret.salt_password.data["salt_password"]
+  ssh_key = data.vault_generic_secret.ssh_pub_key.data["ssh_pub_key"]
 }

@@ -154,3 +154,14 @@ variable "vsphere_cfgparam" {
   description = "vSphere configuration parameters"
   default     = []
 }
+
+variable "salt_password" {
+  type        = string
+  description = "Salt password for the nodes"
+  sensitive   = true
+}
+
+variable "ssh_key" {
+  type        = string
+  description = "SSH public key for the nodes"
+}
