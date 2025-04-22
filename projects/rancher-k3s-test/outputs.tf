@@ -7,11 +7,11 @@ output "cluster_name" {
 
 output "cluster_id" {
   description = "Cluster ID"
-  value = module.rancher.cluster_id
+  value       = module.rancher.cluster_id
 }
 
 output "cluster_kube_config" {
   description = "Kube Config"
-  value     = module.rancher.cluster_kube_config
-  sensitive = true
+  value       = module.rancher.cluster_kube_config
+  sensitive   = true
 }
