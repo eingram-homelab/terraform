@@ -1,0 +1,19 @@
+#cloud-config
+users:
+  - default
+  - name: root
+    lock_passwd: false
+    hashed_passwd: ${salt_password}
+  - name: ansible
+    gecos: Ansible service account
+    groups:
+    - sudo
+    - wheel
+    shell: /bin/bash
+    sudo:
+      - ALL=(ALL) NOPASSWD:ALL
+    passwd: ${salt_password}
+    lock_passwd: false
+    primary_group: ansible
+    ssh_authorized_keys:
+      - ${ssh_key}
