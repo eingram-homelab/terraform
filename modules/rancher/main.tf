@@ -77,7 +77,8 @@ resource "rancher2_cluster_v2" "cluster" {
       # cni = var.cluster_cni
       enable-controller-manager-metrics = true  
       etcd-expose-metrics            = true
-
+      disable-cloud-controller      = true
+      kubelet-arg: [ "cloud-provider=external" ]
     })
 
     # registries {
