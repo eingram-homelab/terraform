@@ -80,3 +80,5 @@ override.tf.json
 
 projects/test/
 *.cred
+/.ansible
+/.vscode
