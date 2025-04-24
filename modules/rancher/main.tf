@@ -92,7 +92,7 @@ resource "rancher2_cluster_v2" "cluster" {
         cloud_credential_secret_name = rancher2_cloud_credential.vsphere.id
         control_plane_role          = true
         etcd_role                   = true
-        worker_role                 = var.worker_node_count > 0 ? false : true
+        worker_role                 = true
         quantity                    = var.control_plane_node_count
         drain_before_delete = true
 
