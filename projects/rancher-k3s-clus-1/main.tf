@@ -48,7 +48,7 @@ module "rancher" {
   rancher_insecure              = true
   vsphere_cloud_credential_name = "vsphere"
   # cluster_cni = "flannel"
-  disabled_features = ["servicelb", "traefik", "local-storage"]
+  disabled_features = ["servicelb", "traefik" ]
   vsphere_tags      = ["dev"]
   vsphere_cfgparam  = ["disk.enableUUID=TRUE"]
   salt_password     = data.vault_generic_secret.salt_password.data["salt_password"]
