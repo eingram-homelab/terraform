@@ -37,7 +37,7 @@ module "rancher" {
   vsphere_network               = ["/HomeLab Datacenter/network/DPG-Lab-LAN1"]
   vsphere_resource_pool         = "/HomeLab Datacenter/host/Intel NUC10 Cluster/Resources/Rancher"
   control_plane_node_count      = 1
-  worker_node_count             = 2
+  worker_node_count             = 0
   control_plane_cpu             = 2
   control_plane_memory          = 8196
   control_plane_disk_size       = 102400
