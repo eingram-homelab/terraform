@@ -1,16 +1,18 @@
-name: Deploy terraform vSphere project
+name: Deploy terraform project
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'projects/vsphere/**'
+      - 'projects/**/**'
 
 jobs:
   deploy:
-    name: Deploy vSphere Project
+    name: Deploy Terraform Project
     runs-on: arc-runners
+    outputs:
+      projects: ${{ steps.collect-artifacts.outputs.projects }}
     env:
       VAULT_ADDR: ${{ vars.VAULT_ADDR }}
       VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
@@ -21,6 +23,11 @@ jobs:
         with:
           repository: eingram-homelab/terraform
           ref: main
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@main
@@ -36,7 +43,22 @@ jobs:
         uses: tj-actions/changed-files@v46.0.5
         with:
           files: |
-            projects/vsphere/**/*.tf
+            projects/**/**/*.tf
+
+      - name: Generate backend configuration
+        if: steps.changed-files.outputs.all_changed_files != ''
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            dir=$(dirname "$file")
+            cat <<EOF > "$dir/backend.tf"
+            terraform {
+                backend "gcs" {
+                    bucket      = "yc-srv1-tfstate"
+                    credentials = "/tmp/cred.json"
+                    prefix      = "terraform/state/$(echo "$dir" | cut -d'/' -f3)-$(basename "$dir")"
+                }
+            }
+          done
 
       - name: Check terraform fmt
         if: steps.changed-files.outputs.all_changed_files != ''
@@ -78,15 +100,30 @@ jobs:
             terraform apply --auto-approve
           done
 
-      - name: Test VM network connectivity
-        id: ping
+      - name: Collect artifacts
+        id: collect-artifacts
+        if: steps.changed-files.outputs.all_changed_files != ''
         run: |
-          sudo apt-get update && sudo apt-get install -y iputils-ping
-          cd projects/cicd/vsphere/tmpl-verify
-          ping -c 4 "$(terraform output -json default_ip_address | jq -r '.[0]')"
-          if [ $? -eq 0 ]; then
-            echo "VM is reachable"
-          else
-            echo "VM is not reachable"
-            exit 1
-          fi
+          declare -a projects
+          x=0
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "Collecting artifacts from $dir"
+            dir=$(dirname "$file")
+            name=$(basename $dir)
+            type=$(echo "$dir" | cut -d'/' -f3)
+            cd "$dir"
+            ip_address=$(terraform output -json default_ip_address | jq -r '.[0]')
+            # Create array from artifacts
+            projects[x]=([name]="$name" [type]="$type" [ip_address]="$ip_address")
+            ((x++))
+          done
+          echo $projects
+          # Create json from array and output to GitHub Actions
+          $(printf '%s\n' "${projects[@]}" | jq -R 'split(" ") | {name: .[0], type: .[1], ip_address: .[2]}') >> $GITHUB_OUTPUT
+
+  # test:
+  #   name: Run post build tests
+  #   runs-on: arc-runners
+  #   needs: deploy
+  #   steps:
+  #     - name: 
