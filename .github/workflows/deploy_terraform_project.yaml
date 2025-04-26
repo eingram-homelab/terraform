@@ -50,7 +50,7 @@ jobs:
         run: |
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             dir=$(dirname "$file")
-            cat > "$dir/backend.tf" << EOF
+            cat > "$dir/backend.tf" <<-EOF
             terraform {
               backend "gcs" {
                 bucket      = "yc-srv1-tfstate"
