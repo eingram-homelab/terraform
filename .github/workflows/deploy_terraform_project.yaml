@@ -51,14 +51,15 @@ jobs:
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             dir=$(dirname "$file")
             cat <<-EOF > "$dir/backend.tf"
-terraform {
-    backend "gcs" {
-        bucket      = "yc-srv1-tfstate"
-        credentials = "/tmp/cred.json"
-        prefix      = "terraform/state/$(echo "$dir" | cut -d'/' -f3)-$(basename "$dir")"
-    }
-}
-EOF
+						terraform {
+							backend "gcs" {
+								bucket      = "yc-srv1-tfstate"
+								credentials = "/tmp/cred.json"
+								prefix      = "terraform/state/$(echo "$dir" | cut -d'/' -f3)-$(basename "$dir")"
+							}
+						}
+						EOF
+            echo "Generated backend.tf for $dir"
           done
 
       - name: Check terraform fmt
