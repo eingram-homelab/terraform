@@ -37,29 +37,29 @@ provider "vsphere" {
 }
 
 module "vm" {
-  source = "../../modules/vsphere/vm"
+  source = "../../s../../modules/vsphere/vm"
 
   # Set one per VM
   # All lists must have same # of elements
 
   vsphere_datastore_list = [
-    # "vsanDatastore",
-    # "vsanDatastore",
+    "vsanDatastore",
+    "vsanDatastore",
     "vsanDatastore"
     # XN_iSCSI_SSD2,
     # XN_iSCSI_SSD2,
   ]
   vsphere_network_list = [
-    # "DPG-Lab-LAN1",
-    # "DPG-Lab-LAN1",
+    "DPG-Lab-LAN1",
+    "DPG-Lab-LAN1",
     "DPG-Lab-LAN1"
     # "DPG-Services",
     # "DPG-Services"
   ]
   vm_name_list = [
-    # "k3s-mgmt-cp1",
-    # "k3s-mgmt-worker1",
-    "k3s-rancher-cp1"
+    "k3s-mgmt-cp1",
+    "k3s-mgmt-worker1",
+    "k3s-mgmt-worker2"
     # k3s2,
     # k3s3
   ]
@@ -88,7 +88,7 @@ module "vm" {
   ]
 
   vm_tags = [
-    "dev"
+    "prod"
   ]
   
   # Linux images

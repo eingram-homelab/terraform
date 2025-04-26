@@ -1,0 +1,92 @@
+name: Deploy terraform vSphere project
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'projects/vsphere/**'
+
+jobs:
+  deploy:
+    name: Deploy vSphere Project
+    runs-on: arc-runners
+    env:
+      VAULT_ADDR: ${{ vars.VAULT_ADDR }}
+      VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
+      GCP_STORAGE: ${{ secrets.GCP_STORAGE }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          repository: eingram-homelab/terraform
+          ref: main
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@main
+        with:
+          terraform_version: 1.11.3
+
+      - name: Create json cred file
+        run: |
+          echo ${{ secrets.GCP_STORAGE }} | base64 --decode > /tmp/cred.json
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v46.0.5
+        with:
+          files: |
+            projects/vsphere/**/*.tf
+
+      - name: Check terraform fmt
+        if: steps.changed-files.outputs.all_changed_files != ''
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            dir=$(dirname "$file")
+            echo "Running terraform fmt for $dir"
+            cd "$dir"
+            terraform fmt -check
+          done
+
+      - name: Run terraform init
+        if: steps.changed-files.outputs.all_changed_files != ''
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            dir=$(dirname "$file")
+            echo "Running terraform init for $dir"
+            cd "$dir"
+            terraform init
+          done
+
+      - name: Run terraform validate
+        if: steps.changed-files.outputs.all_changed_files != ''
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            dir=$(dirname "$file")
+            echo "Running terraform validate for $dir"
+            cd "$dir"
+            terraform validate
+          done
+
+      - name: Run terraform apply
+        if: steps.changed-files.outputs.all_changed_files != ''
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            dir=$(dirname "$file")
+            echo "Running terraform apply for $dir"
+            cd "$dir"
+            terraform apply --auto-approve
+          done
+
+      - name: Test VM network connectivity
+        id: ping
+        run: |
+          sudo apt-get update && sudo apt-get install -y iputils-ping
+          cd projects/cicd/vsphere/tmpl-verify
+          ping -c 4 "$(terraform output -json default_ip_address | jq -r '.[0]')"
+          if [ $? -eq 0 ]; then
+            echo "VM is reachable"
+          else
+            echo "VM is not reachable"
+            exit 1
+          fi
