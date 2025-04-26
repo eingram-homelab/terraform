@@ -58,6 +58,7 @@ jobs:
                     prefix      = "terraform/state/$(echo "$dir" | cut -d'/' -f3)-$(basename "$dir")"
                 }
             }
+            EOF
           done
 
       - name: Check terraform fmt
