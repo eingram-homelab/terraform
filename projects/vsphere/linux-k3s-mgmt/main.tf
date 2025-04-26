@@ -37,7 +37,7 @@ provider "vsphere" {
 }
 
 module "vm" {
-  source = "../../s../../modules/vsphere/vm"
+  source = "../../../modules/vsphere/vm"
 
   # Set one per VM
   # All lists must have same # of elements
