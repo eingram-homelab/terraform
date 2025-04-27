@@ -37,7 +37,9 @@ jobs:
         run: |
           if [ "${{ steps.changed-files.outputs.all_changed_files }}" != "" ]; then
             projects=$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | grep -oE '([a-zA-Z]+\/)+')
+            echo $projects
             unique_project=$(echo "$projects" | sort -u)
+            echo $unique_project
             if [ $(echo "$unique_project" | wc -l) -gt 1 ]; then
               echo "Error: More than one project changed. Please limit changes to one project at a time."
               exit 1
@@ -125,7 +127,7 @@ jobs:
             done
             echo ansible_limit="$(IFS=,; echo "${name_list[*]}")" >> $GITHUB_OUTPUT
             echo $GITHUB_OUTPUT
-            
+
   # call_post_deploy_vsphere_workflow:
   #   needs: deploy
   #   if: needs.deploy.outputs.project == 'vsphere'
