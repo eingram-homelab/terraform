@@ -36,6 +36,7 @@ jobs:
         id: check-projects
         run: |
           if [ "${{ steps.changed-files.outputs.all_changed_files }}" != "" ]; then
+            echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
             projects=$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | grep -oE '([a-zA-Z]+\/)+')
             echo ${projects[@]}
             unique_project=$(echo "$projects" | sort -u)
