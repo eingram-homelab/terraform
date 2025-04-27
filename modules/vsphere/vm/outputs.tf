@@ -13,6 +13,10 @@ output "guest_ip_addresses" {
   value       = vsphere_virtual_machine.vm.*.guest_ip_addresses
 }
 
+output "dns_suffix" {
+  description = "DNS Suffix of the VM"
+  value       = vsphere_virtual_machine.vm.*.dns_suffix
+}
 output "uuid" {
   description = "UUID of the VM in vSphere"
   value       = vsphere_virtual_machine.vm.*.uuid
