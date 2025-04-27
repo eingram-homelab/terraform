@@ -124,8 +124,8 @@ jobs:
                   --arg ty "$type" \
                   --arg ip "$ip_address" \
                   '{name: $nm, type: $ty, ip_address: $ip}' )
+            echo "$JSON_STRING" >> "$GITHUB_OUTPUT"
           done
-          # echo "$JSON_STRING" >> $GITHUB_OUTPUT
 
   # test:
   #   name: Run post build tests
