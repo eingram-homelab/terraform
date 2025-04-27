@@ -102,12 +102,15 @@ jobs:
             terraform apply --auto-approve
           done
 
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
       - name: Collect artifacts
         id: collect-artifacts
         if: steps.changed-files.outputs.all_changed_files != ''
         run: |
-          declare -a projects
-          x=0
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             echo "Collecting artifacts from $dir"
             dir=$(dirname "$file")
@@ -115,13 +118,14 @@ jobs:
             type=$(echo "$dir" | cut -d'/' -f3)
             cd "$dir"
             ip_address=$(terraform output -json default_ip_address | jq -r '.[0]')
-            # Create array from artifacts
-            projects[x]=([name]="$name" [type]="$type" [ip_address]="$ip_address")
-            ((x++))
+            # Create json from artifacts
+            JSON_STRING+=$( jq -n \
+                  --arg nm "$name" \
+                  --arg ty "$type" \
+                  --arg ip "$ip_address" \
+                  '{name: $nm, type: $ty, ip_address: $ip}' )
           done
-          echo $projects
-          # Create json from array and output to GitHub Actions
-          $(printf '%s\n' "${projects[@]}" | jq -R 'split(" ") | {name: .[0], type: .[1], ip_address: .[2]}') >> $GITHUB_OUTPUT
+          echo "$JSON_STRING" >> $GITHUB_OUTPUTS
 
   # test:
   #   name: Run post build tests
