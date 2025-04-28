@@ -133,20 +133,16 @@ jobs:
               
               if terraform output -json name &>/dev/null; then
                 names=$(terraform output -json name | jq -r '.')
-                echo $names
                 while IFS= read -r item; do
                   [ -n "$item" ] && name_list+=("$item")
                 done < <(jq -c '.[]' <<< "$names")
-                echo "Name list: ${name_list[@]}"
                 if [ ${#name_list[@]} -eq 0 ]; then
                   echo "Warning: No names found in output"
                   exit 1
                 fi
                 
                 for i in "${!name_list[@]}"; do
-                  echo $i                
-                  i=$(echo "$i" | tr -d '"')
-                  echo $1
+                  name_list[$i]=$(echo "name_list[$i]" | tr -d '"')
                   name_list[$i]="${name_list[$i]}"."$domain"
                 done
                 
