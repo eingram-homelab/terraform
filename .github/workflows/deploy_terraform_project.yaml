@@ -178,7 +178,7 @@ jobs:
     secrets: inherit
 
   run_terraform_destroy:
-    needs: deploy
+    needs: call_post_deploy_vsphere_workflow
     runs-on: arc-runners
     if: always()
     env:
