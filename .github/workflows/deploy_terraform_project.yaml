@@ -142,7 +142,7 @@ jobs:
                 fi
                 
                 for i in "${!name_list[@]}"; do
-                  name_list[$i]=$(echo "name_list[$i]" | tr -d '"')
+                  name_list[$i]=$(echo "${name_list[$i]}" | tr -d '"')
                   name_list[$i]="${name_list[$i]}"."$domain"
                 done
                 
