@@ -120,7 +120,7 @@ jobs:
           echo "Collecting artifacts from $dir"
           echo project_name=$(basename $dir) >> $GITHUB_OUTPUT
           if [ $project_name == *"linux"* ]; then
-            echo "ansible_user="ansible" >> $GITHUB_OUTPUT
+            echo ansible_user="ansible" >> $GITHUB_OUTPUT
           fi
           type=$(echo "$dir" | cut -d'/' -f2)
           echo "Project type: $type"
