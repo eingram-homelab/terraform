@@ -111,6 +111,7 @@ jobs:
 
       - name: Collect artifacts
         id: collect-artifacts
+        continue-on-error: true
         run: |
           dir=${{ steps.check-projects.outputs.project }}
           echo "Collecting artifacts from $dir"
@@ -124,7 +125,7 @@ jobs:
             
             # Use -e to check if output exists
             if terraform output -json domain &>/dev/null; then
-              domain=$(terraform output -json domain | jq -r '.[0] // empty')
+              domain=$(terraform output -json domain | jq -r '. // empty')
               if [ -z "$domain" ]; then
                 echo "Warning: Domain output is empty or null"
                 exit 1
@@ -157,6 +158,14 @@ jobs:
               exit 1
             fi
           fi
+
+      - name: Run terraform destroy if unable to retrieve artifacts
+        if: steps.collect-artifacts.outcome == 'failure'
+        run: |
+          dir=${{ steps.check-projects.outputs.project }}
+          echo "Running terraform destroy for $dir"
+          cd "$dir"
+          terraform destroy --auto-approve
 
   # call_post_deploy_vsphere_workflow:
   #   needs: deploy
