@@ -118,7 +118,7 @@ jobs:
           type=$(echo "$dir" | cut -d'/' -f3)
           cd "$dir"
           if [ $type == "vsphere" ]; then
-            domain=$(terraform output -json dns_suffix | jq -r '.[0]')
+            domain=$(terraform output -json domain | jq -r '.[0]')
             names=$(terraform output -json name | jq -r '.')
             while IFS= read -r item; do
               name_list+=("$item")
