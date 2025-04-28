@@ -170,6 +170,7 @@ jobs:
       extra_vars: "hostvar=all"
 
   run_terraform_destroy:
+    needs: deploy
     runs-on: arc-runners
     if: always()
     env:
