@@ -14,7 +14,7 @@ jobs:
     runs-on: arc-runners
     outputs:
       project_name: ${{ steps.collect-artifacts.outputs.project_name }}
-      project_type: ${{ steps.collect-artifacts.outputs.project }}
+      project_type: ${{ steps.collect-artifacts.outputs.project_type }}
       ansible_limit: ${{ steps.collect-artifacts.outputs.ansible_limit }}
     env:
       VAULT_ADDR: ${{ vars.VAULT_ADDR }}
