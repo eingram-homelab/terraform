@@ -16,6 +16,7 @@ jobs:
       project_name: ${{ steps.collect-artifacts.outputs.project_name }}
       project_type: ${{ steps.collect-artifacts.outputs.project_type }}
       ansible_limit: ${{ steps.collect-artifacts.outputs.ansible_limit }}
+      ansible_user: ${{ steps.collect-artifacts.outputs.ansible_user }}
     env:
       VAULT_ADDR: ${{ vars.VAULT_ADDR }}
       VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
@@ -118,6 +119,9 @@ jobs:
           dir=${{ steps.check-projects.outputs.project }}
           echo "Collecting artifacts from $dir"
           echo project_name=$(basename $dir) >> $GITHUB_OUTPUT
+          if [ $project_name == *"linux"* ]; then
+            echo "ansible_user="ansible" >> $GITHUB_OUTPUT
+          fi
           type=$(echo "$dir" | cut -d'/' -f2)
           echo "Project type: $type"
           echo project_type=$type >> $GITHUB_OUTPUT
@@ -170,6 +174,9 @@ jobs:
       limit: ${{ needs.deploy.outputs.ansible_limit }}
       playbook: "new_build.yaml"
       extra_vars: "hostvar=all"
+      ansible_user: ${{ needs.deploy.outputs.ansible_user }}
+    secrets:
+      VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
 
   run_terraform_destroy:
     needs: deploy
