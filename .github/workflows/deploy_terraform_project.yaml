@@ -127,7 +127,7 @@ jobs:
               name_list[$i]="${name_list[$i]}"."$domain"
             done
             echo ansible_limit="$(IFS=,; echo "${name_list[*]}")" >> $GITHUB_OUTPUT
-            echo $GITHUB_OUTPUT
+            echo "$(IFS=,; echo "${name_list[*]}")"
 
   # call_post_deploy_vsphere_workflow:
   #   needs: deploy
