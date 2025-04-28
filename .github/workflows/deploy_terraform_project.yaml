@@ -115,7 +115,7 @@ jobs:
           dir=${{ steps.check-projects.outputs.project }}
           echo "Collecting artifacts from $dir"
           echo project_name=$(basename $dir) >> $GITHUB_OUTPUT
-          type=$(echo "$dir" | cut -d'/' -f3)
+          type=$(echo "$dir" | cut -d'/' -f2)
           echo "Project type: $type"
           cd "$dir"
           if [ "$type" == "vsphere" ]; then
