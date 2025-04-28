@@ -13,10 +13,6 @@ output "guest_ip_addresses" {
   value       = module.vm.guest_ip_addresses
 }
 
-output "dns_suffix_list" {
-  description = "DNS Suffix List of the VM"
-  value       = module.vm.dns_suffix_list
-}
 output "uuid" {
   description = "UUID of the VM in vSphere"
   value       = module.vm.uuid
@@ -25,4 +21,9 @@ output "uuid" {
 output "disk" {
   description = "Disks of the deployed VM"
   value       = module.vm.disk
+}
+
+output "domain" {
+  description = "Domain suffix of the VM in vSphere"
+  value       = module.vm.domain
 }
