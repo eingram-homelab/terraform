@@ -167,12 +167,11 @@ jobs:
           cd "$dir"
           terraform destroy --auto-approve
 
-  # call_post_deploy_vsphere_workflow:
-  #   needs: deploy
-  #   if: needs.deploy.outputs.project == 'vsphere'
-  #   uses: eingram-homelab/ansible-col-homelab/.github/workflows/test_reusable.yaml@main
-  #   with:
-  #     ansible_limit: ${{ needs.deploy.outputs.ansible_limit }}
-
-
-
+  call_post_deploy_vsphere_workflow:
+    needs: deploy
+    if: needs.deploy.outputs.project == 'vsphere'
+    uses: eingram-homelab/ansible-col-homelab/.github/workflows/run_playbook.yaml@develop
+    with:
+      limit: ${{ needs.deploy.outputs.ansible_limit }}
+      playbook: "new_build.yaml"
+      extra_vars: "hostvar=all"
