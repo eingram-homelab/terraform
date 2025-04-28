@@ -175,8 +175,7 @@ jobs:
       playbook: "new_build.yaml"
       extra_vars: "hostvar=all"
       ansible_user: ${{ needs.deploy.outputs.ansible_user }}
-    secrets:
-      VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
+    secrets: inherit
 
   run_terraform_destroy:
     needs: deploy
