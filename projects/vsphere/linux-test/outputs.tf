@@ -13,9 +13,9 @@ output "guest_ip_addresses" {
   value       = module.vm.guest_ip_addresses
 }
 
-output "domain" {
-  description = "Domain of the VM"
-  value       = module.vm.domain
+output "dns_suffix_list" {
+  description = "DNS Suffix List of the VM"
+  value       = module.vm.dns_suffix_list
 }
 output "uuid" {
   description = "UUID of the VM in vSphere"
