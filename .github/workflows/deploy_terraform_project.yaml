@@ -112,22 +112,50 @@ jobs:
       - name: Collect artifacts
         id: collect-artifacts
         run: |
-          echo "Collecting artifacts from $dir"
           dir=${{ steps.check-projects.outputs.project }}
+          echo "Collecting artifacts from $dir"
           echo project_name=$(basename $dir) >> $GITHUB_OUTPUT
           type=$(echo "$dir" | cut -d'/' -f3)
           cd "$dir"
-          if [ $type == "vsphere" ]; then
-            domain=$(terraform output -json domain | jq -r '.[0]')
-            names=$(terraform output -json name | jq -r '.')
-            while IFS= read -r item; do
-              name_list+=("$item")
-            done < <(jq -c '.[]' <<< "$names")
-            for i in "${!name_list[@]}"; do
-              name_list[$i]="${name_list[$i]}"."$domain"
-            done
-            echo ansible_limit="$(IFS=,; echo "${name_list[*]}")" >> $GITHUB_OUTPUT
-            echo "$(IFS=,; echo "${name_list[*]}")"
+          if [ "$type" == "vsphere" ]; then
+            # Initialize empty array
+            declare -a name_list=()
+            
+            # Use -e to check if output exists
+            if terraform output -json domain &>/dev/null; then
+              domain=$(terraform output -json domain | jq -r '.[0] // empty')
+              if [ -z "$domain" ]; then
+                echo "Warning: Domain output is empty or null"
+                exit 1
+              fi
+              
+              if terraform output -json name &>/dev/null; then
+                names=$(terraform output -json name | jq -r '.')
+                while IFS= read -r item; do
+                  [ -n "$item" ] && name_list+=("$item")
+                done < <(jq -c '.[]' <<< "$names")
+                
+                if [ ${#name_list[@]} -eq 0 ]; then
+                  echo "Warning: No names found in output"
+                  exit 1
+                fi
+                
+                for i in "${!name_list[@]}"; do
+                  name_list[$i]="${name_list[$i]}"."$domain"
+                done
+                
+                ansible_hosts=$(IFS=,; echo "${name_list[*]}")
+                echo "ansible_limit=$ansible_hosts" >> $GITHUB_OUTPUT
+                echo "Generated hosts: $ansible_hosts"
+              else
+                echo "Error: 'name' output not found"
+                exit 1
+              fi
+            else
+              echo "Error: 'domain' output not found"
+              exit 1
+            fi
+          fi
 
   # call_post_deploy_vsphere_workflow:
   #   needs: deploy
@@ -135,7 +163,6 @@ jobs:
   #   uses: eingram-homelab/ansible-col-homelab/.github/workflows/test_reusable.yaml@main
   #   with:
   #     ansible_limit: ${{ needs.deploy.outputs.ansible_limit }}
-    
 
 
-    
+
