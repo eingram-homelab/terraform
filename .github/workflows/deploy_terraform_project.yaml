@@ -182,7 +182,7 @@ jobs:
       - deploy
       - call_post_deploy_vsphere_workflow
     runs-on: arc-runners
-    if: ${{ (needs.deploy.steps.collect-artifacts.outcome == 'failure') || (needs.call_post_deploy_vsphere_workflow.result == 'failure') }}
+    if: ${{ always() && ((needs.deploy.steps.collect-artifacts.outcome == 'failure') || (needs.call_post_deploy_vsphere_workflow.result == 'failure')) }}
     env:
       VAULT_ADDR: ${{ vars.VAULT_ADDR }}
       VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
