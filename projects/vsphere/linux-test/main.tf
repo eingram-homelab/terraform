@@ -19,7 +19,7 @@ data "vault_generic_secret" "win_password" {
   path = "secret/win/administrator"
 }
 
-data "vault_generic_secret" "ssh_ed25519_pub_key" {
+data "vault_generic_secret" "ssh_pub_key" {
   path = "secret/ssh/ansible"
 }
 
@@ -120,7 +120,7 @@ module "vm" {
 
   # Used for Windows and Linux
   admin_password = data.vault_generic_secret.win_password.data["win_password"]
-  ssh_key        = data.vault_generic_secret.ssh_ed25519_pub_key.data["ssh_ed25519_pub_key"]
+  ssh_key        = data.vault_generic_secret.ssh_pub_key.data["ssh_pub_key"]
 
   # Only for Windows Workgroup to set admin user
   run_once_command_list = [
