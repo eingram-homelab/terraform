@@ -68,7 +68,8 @@ jobs:
       - name: Generate backend configuration
         run: |
           dir=${{ steps.check-projects.outputs.project }}
-          cat > "$dir/gha-backend.tf" <<EOF
+          sudo rm -f "$dir/backend.tf"
+          cat > "$dir/backend.tf" <<EOF
           terraform {
             backend "gcs" {
               bucket      = "yc-srv1-tfstate"
@@ -91,7 +92,7 @@ jobs:
           dir=${{ steps.check-projects.outputs.project }}
           echo "Running terraform init for $dir"
           cd "$dir"
-          terraform init --backend-config=gha-backend.tf
+          terraform init
 
       - name: Run terraform validate
         run: |
