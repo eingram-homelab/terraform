@@ -10,8 +10,8 @@ output "cluster_id" {
   value       = module.rancher.cluster_id
 }
 
-output "cluster_kube_config" {
-  description = "Kube Config"
-  value       = module.rancher.cluster_kube_config
-  sensitive   = true
-}
+# output "cluster_kube_config" {
+#   description = "Kube Config"
+#   value       = module.rancher.cluster_kube_config
+#   sensitive   = true
+# }
