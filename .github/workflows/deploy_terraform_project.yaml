@@ -91,7 +91,7 @@ jobs:
           dir=${{ steps.check-projects.outputs.project }}
           echo "Running terraform init for $dir"
           cd "$dir"
-          terraform init --backend-config-file=gha-backend.tf
+          terraform init --backend-file=gha-backend.tf
 
       - name: Run terraform validate
         run: |
