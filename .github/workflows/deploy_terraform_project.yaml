@@ -73,7 +73,7 @@ jobs:
             backend "gcs" {
               bucket      = "yc-srv1-tfstate"
               credentials = "/tmp/cred.json"
-              prefix      = "terraform/state/$(echo "$dir" | cut -d'/' -f3)-$(basename "$dir")"
+              prefix      = "terraform/state/$(echo "$dir" | cut -d'/' -f3)"
             }
           }
           EOF
