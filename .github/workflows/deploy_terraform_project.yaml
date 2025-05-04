@@ -69,6 +69,7 @@ jobs:
         run: |
           dir=${{ steps.check-projects.outputs.project }}
           sudo rm -f "$dir/backend.tf"
+          echo "Generated backend.tf for $dir"
           cat > "$dir/backend.tf" <<EOF
           terraform {
             backend "gcs" {
@@ -78,7 +79,6 @@ jobs:
             }
           }
           EOF
-          echo "Generated backend.tf for $dir"
 
       - name: Check terraform fmt
         run: |
