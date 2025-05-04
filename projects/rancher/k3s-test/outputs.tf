@@ -15,3 +15,8 @@ output "cluster_id" {
 #   value       = module.rancher.cluster_kube_config
 #   sensitive   = true
 # }
+
+output "cluster_all" {
+  description = "Cluster All"
+  value       = module.rancher.cluster_all
+}
