@@ -44,6 +44,9 @@ jobs:
             echo ${projects[@]}
             unique_project=$(echo "$projects" | sort -u)
             echo $unique_project
+            type=$(echo "$dir" | cut -d'/' -f2)
+            echo "Project type: $type"
+            echo project_type=$type >> $GITHUB_OUTPUT
             if [ $(echo "$unique_project" | wc -l) -gt 1 ]; then
               echo "Error: More than one project changed. Please limit changes to one project at a time."
               exit 1
@@ -113,9 +116,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y jq
 
-      - name: Collect artifacts
-        id: collect-artifacts
-        continue-on-error: true
+      - name: Collect artifacts for vSphere project
+        id: collect-artifacts-vsphere
+        if: steps.check-projects.outputs.project_type == 'vsphere'
+        continue-on-error: false
         run: |
           dir=${{ steps.check-projects.outputs.project }}
           echo "Collecting artifacts from $dir"
@@ -123,54 +127,100 @@ jobs:
           if [ $project_name == *"linux"* ]; then
             echo ansible_user="ansible" >> $GITHUB_OUTPUT
           fi
-          type=$(echo "$dir" | cut -d'/' -f2)
-          echo "Project type: $type"
-          echo project_type=$type >> $GITHUB_OUTPUT
           cd "$dir"
-          if [ "$type" == "vsphere" ]; then
-            # Initialize empty array
-            declare -a name_list=()
+
+          # Initialize empty array
+          declare -a name_list=()
+          
+          # Check if output exists
+          if terraform output -json domain &>/dev/null; then
+            domain=$(terraform output -json domain | jq -r '. // empty')
+            if [ -z "$domain" ]; then
+              echo "Warning: Domain output is empty or null"
+              exit 1
+            fi
             
-            # Use -e to check if output exists
-            if terraform output -json domain &>/dev/null; then
-              domain=$(terraform output -json domain | jq -r '. // empty')
-              if [ -z "$domain" ]; then
-                echo "Warning: Domain output is empty or null"
+            if terraform output -json name &>/dev/null; then
+              names=$(terraform output -json name | jq -r '.')
+              while IFS= read -r item; do
+                [ -n "$item" ] && name_list+=("$item")
+              done < <(jq -c '.[]' <<< "$names")
+              if [ ${#name_list[@]} -eq 0 ]; then
+                echo "Warning: No names found in output"
                 exit 1
               fi
               
-              if terraform output -json name &>/dev/null; then
-                names=$(terraform output -json name | jq -r '.')
-                while IFS= read -r item; do
-                  [ -n "$item" ] && name_list+=("$item")
-                done < <(jq -c '.[]' <<< "$names")
-                if [ ${#name_list[@]} -eq 0 ]; then
-                  echo "Warning: No names found in output"
-                  exit 1
-                fi
-                
-                for i in "${!name_list[@]}"; do
-                  name_list[$i]=$(echo "${name_list[$i]}" | tr -d '"')
-                  name_list[$i]="${name_list[$i]}"."$domain"
-                done
-                
-                ansible_hosts=$(IFS=,; echo "${name_list[*]}")
-                echo "ansible_limit=$ansible_hosts" >> $GITHUB_OUTPUT
-                echo "Generated hosts: $ansible_hosts"
-              else
-                echo "Error: 'name' output not found"
-                exit 1
-              fi
+              for i in "${!name_list[@]}"; do
+                name_list[$i]=$(echo "${name_list[$i]}" | tr -d '"')
+                name_list[$i]="${name_list[$i]}"."$domain"
+              done
+              
+              ansible_hosts=$(IFS=,; echo "${name_list[*]}")
+              echo "ansible_limit=$ansible_hosts" >> $GITHUB_OUTPUT
+              echo "Generated hosts: $ansible_hosts"
             else
-              echo "Error: 'domain' output not found"
+              echo "Error: 'name' output not found"
               exit 1
             fi
+          else
+            echo "Error: 'domain' output not found"
+            exit 1
           fi
+
+      - name: Collect artifacts for Rancher project
+        id: collect-artifacts-rancher
+        if: steps.check-projects.outputs.project_type == 'rancher'
+        continue-on-error: true
+        run: |
+          dir=${{ steps.check-projects.outputs.project }}
+          echo "Collecting artifacts from $dir"
+          echo project_name=$(basename $dir) >> $GITHUB_OUTPUT
+          cd "$dir"
+          
+          # Check if output exists
+          if terraform output -json cluster_name &>/dev/null; then
+            cluster_name=$(terraform output -json cluster_name | jq -r '. // empty')
+            if [ -z "$cluster_name" ]; then
+              echo "Warning: Cluster name output is empty or null"
+              exit 1
+            fi
+          else
+            echo "Error: 'cluster_name' output not found"
+            exit 1
+          fi
+
+          # Check if cluster_kube_config output exists
+          if terraform output -json cluster_kube_config &>/dev/null; then
+            cluster_kube_config=$(terraform output -json cluster_kube_config | jq -r '. // empty')
+            if [ -z "$cluster_kube_config" ]; then
+              echo "Warning: Cluster kube config output is empty or null"
+              exit 1
+            fi
+          else
+            echo "Error: 'cluster_kube_config' output not found"
+            exit 1
+          fi
+          
+          if terraform output -json cluster_rke_config &>/dev/null; then
+            cluster_lb_ip=$(terraform output cluster_rke_config | grep -oE '10.10.+')
+            if [ -z "$cluster_lb_ip" ]; then
+              echo "Warning: Cluster load balancer IP output is empty or null"
+              exit 1
+            fi
+          else
+            echo "Error: 'cluster_rke_config' output not found"
+            exit 1
+          fi
+
+          # Create outputs
+          echo "cluster_name=$cluster_name" >> $GITHUB_OUTPUT
+          echo "cluster_kube_config=$cluster_kube_config" >> $GITHUB_OUTPUT
+          echo "cluster_lb_ip=$cluster_lb_ip" >> $GITHUB_OUTPUT
 
   call_post_deploy_vsphere_workflow:
     needs: deploy
     if: needs.deploy.outputs.project_type == 'vsphere'
-    uses: eingram-homelab/ansible-col-homelab/.github/workflows/run_playbook.yaml@develop
+    uses: eingram-homelab/ansible-col-homelab/.github/workflows/run_playbook.yaml@main
     with:
       limit: ${{ needs.deploy.outputs.ansible_limit }}
       playbook: "new_build.yaml"
@@ -178,84 +228,94 @@ jobs:
       ansible_user: ${{ needs.deploy.outputs.ansible_user }}
     secrets: inherit
 
-  # run_terraform_destroy:
-  #   needs:
-  #     - deploy
-  #     - call_post_deploy_vsphere_workflow
-  #   runs-on: arc-runners
-  #   if: ${{ always() && ((needs.deploy.steps.collect-artifacts.outcome == 'failure') || (needs.call_post_deploy_vsphere_workflow.result == 'failure')) }}
-  #   env:
-  #     VAULT_ADDR: ${{ vars.VAULT_ADDR }}
-  #     VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
-  #     GCP_STORAGE: ${{ secrets.GCP_STORAGE }}
-  #   steps:
-  #     - name: Checkout Code
-  #       uses: actions/checkout@v4
-  #       with:
-  #         repository: eingram-homelab/terraform
-  #         ref: develop
+  call_post_deploy_rancher_workflow:
+    needs: deploy
+    if: needs.deploy.outputs.project_type == 'rancher'
+    uses: eingram-homelab/ansible-col-homelab/.github/workflows/run_playbook.yaml@main
+    with:
+      limit: "localhost"
+      extra_vars: "cluster=${{ needs.deploy.outputs.ansible_limit }} lb_ip=${{ needs.deploy.outputs.cluster_lb_ip }} kubeconfig=${{ needs.deploy.outputs.cluster_kube_config }}"
+      playbook: "new_build.yaml"
+    secrets: inherit
 
-  #     - name: Get changed files
-  #       id: changed-files
-  #       uses: tj-actions/changed-files@v46.0.5
-  #       with:
-  #         files: |
-  #           projects/**/**/*.tf
+  run_terraform_destroy:
+    needs:
+      - deploy
+      - call_post_deploy_vsphere_workflow
+    runs-on: arc-runners
+    if: ${{ always() && ((needs.deploy.steps.collect-artifacts.outcome == 'failure') || (needs.call_post_deploy_vsphere_workflow.result == 'failure')) }}
+    env:
+      VAULT_ADDR: ${{ vars.VAULT_ADDR }}
+      VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
+      GCP_STORAGE: ${{ secrets.GCP_STORAGE }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          repository: eingram-homelab/terraform
+          ref: develop
 
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: '20'
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v46.0.5
+        with:
+          files: |
+            projects/**/**/*.tf
 
-  #     - name: Setup Terraform
-  #       uses: hashicorp/setup-terraform@main
-  #       with:
-  #         terraform_version: 1.11.3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-  #     - name: Create json cred file
-  #       run: |
-  #         echo ${{ secrets.GCP_STORAGE }} | base64 --decode > /tmp/cred.json
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@main
+        with:
+          terraform_version: 1.11.3
 
-  #     - name: Ensure only one project is changed
-  #       id: check-projects
-  #       run: |
-  #         if [ "${{ steps.changed-files.outputs.all_changed_files }}" != "" ]; then
-  #           echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
-  #           projects=$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | grep -oE '.+\/')
-  #           echo ${projects[@]}
-  #           unique_project=$(echo "$projects" | sort -u)
-  #           echo $unique_project
-  #           if [ $(echo "$unique_project" | wc -l) -gt 1 ]; then
-  #             echo "Error: More than one project changed. Please limit changes to one project at a time."
-  #             exit 1
-  #           fi
-  #           echo "project=$unique_project" >> $GITHUB_OUTPUT
-  #         fi
+      - name: Create json cred file
+        run: |
+          echo ${{ secrets.GCP_STORAGE }} | base64 --decode > /tmp/cred.json
 
-  #     - name: Generate backend configuration
-  #       run: |
-  #         dir=${{ steps.check-projects.outputs.project }}
-  #         cat > "$dir/backend.tf" <<EOF
-  #         terraform {
-  #           backend "gcs" {
-  #             bucket      = "yc-srv1-tfstate"
-  #             credentials = "/tmp/cred.json"
-  #             prefix      = "terraform/state/$(echo "$dir" | cut -d'/' -f3)-$(basename "$dir")"
-  #           }
-  #         }
-  #         EOF
-  #         echo "Generated backend.tf for $dir"
+      - name: Ensure only one project is changed
+        id: check-projects
+        run: |
+          if [ "${{ steps.changed-files.outputs.all_changed_files }}" != "" ]; then
+            echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
+            projects=$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | grep -oE '.+\/')
+            echo ${projects[@]}
+            unique_project=$(echo "$projects" | sort -u)
+            echo $unique_project
+            if [ $(echo "$unique_project" | wc -l) -gt 1 ]; then
+              echo "Error: More than one project changed. Please limit changes to one project at a time."
+              exit 1
+            fi
+            echo "project=$unique_project" >> $GITHUB_OUTPUT
+          fi
 
-  #     - name: Run terraform init
-  #       run: |
-  #         dir=${{ steps.check-projects.outputs.project }}
-  #         echo "Running terraform init for $dir"
-  #         cd "$dir"
-  #         terraform init
+      - name: Generate backend configuration
+        run: |
+          dir=${{ steps.check-projects.outputs.project }}
+          cat > "$dir/backend.tf" <<EOF
+          terraform {
+            backend "gcs" {
+              bucket      = "yc-srv1-tfstate"
+              credentials = "/tmp/cred.json"
+              prefix      = "terraform/state/$(echo "$dir" | cut -d'/' -f3)-$(basename "$dir")"
+            }
+          }
+          EOF
+          echo "Generated backend.tf for $dir"
 
-  #     - name: Run terraform destroy
-  #       run: |
-  #         dir=${{ steps.check-projects.outputs.project }}
-  #         echo "Running terraform destroy for $dir"
-  #         cd "$dir"
-  #         terraform destroy --auto-approve
+      - name: Run terraform init
+        run: |
+          dir=${{ steps.check-projects.outputs.project }}
+          echo "Running terraform init for $dir"
+          cd "$dir"
+          terraform init
+
+      - name: Run terraform destroy
+        run: |
+          dir=${{ steps.check-projects.outputs.project }}
+          echo "Running terraform destroy for $dir"
+          cd "$dir"
+          terraform destroy --auto-approve
