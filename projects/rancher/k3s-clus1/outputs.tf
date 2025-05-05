@@ -16,8 +16,8 @@ output "cluster_kube_config" {
   sensitive   = true
 }
 
-output "cluster_all" {
-  description = "Cluster All"
-  value       = module.rancher.cluster_all
-  sensitive   = true
+output "cluster_rke_config" {
+  description = "Cluster rke_config"
+  value       = module.rancher.cluster_rke_config
+  sensitive   = false
 }
