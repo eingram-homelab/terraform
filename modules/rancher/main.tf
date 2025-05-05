@@ -75,6 +75,8 @@ resource "rancher2_cluster_v2" "cluster" {
     machine_global_config = yamlencode({
       "disable" = length(var.disabled_features) > 0 ? var.disabled_features : []
       # cni = var.cluster_cni
+      tls_san = var.tls_san
+      selinux = true
       enable-controller-manager-metrics = true  
       etcd-expose-metrics            = true
       kubelet-arg: [ "cloud-provider=external" ]

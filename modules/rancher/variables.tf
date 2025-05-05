@@ -165,3 +165,9 @@ variable "ssh_key" {
   type        = string
   description = "SSH public key for the nodes"
 }
+
+variable "tls_san" {
+  type        = list(string)
+  description = "List of SANs for the TLS certificate"
+  default     = []
+}
