@@ -26,7 +26,7 @@ module "rancher" {
   rancher_api_url               = "https://rancher.local.lan"
   rancher_access_key            = data.vault_generic_secret.token.data["token"]
   rancher_secret_key            = data.vault_generic_secret.secret.data["secret"]
-  cluster_name                  = "k3s-clus-1"
+  cluster_name                  = "k3s-clus1"
   kubernetes_version            = "v1.31.1+k3s1"
   vsphere_vcenter               = "vcsa-1.local.lan"
   vsphere_username              = "administrator@vsphere.local"
@@ -48,7 +48,7 @@ module "rancher" {
   rancher_insecure              = true
   vsphere_cloud_credential_name = "vsphere"
   # cluster_cni = "flannel"
-  disabled_features = ["servicelb", "traefik" ]
+  disabled_features = ["servicelb", "traefik"]
   vsphere_tags      = ["dev"]
   vsphere_cfgparam  = ["disk.enableUUID=TRUE"]
   salt_password     = data.vault_generic_secret.salt_password.data["salt_password"]
