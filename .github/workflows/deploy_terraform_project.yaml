@@ -236,14 +236,15 @@ jobs:
       limit: "localhost"
       extra_vars: "cluster=${{ needs.deploy.outputs.ansible_limit }} lb_ip=${{ needs.deploy.outputs.cluster_lb_ip }} kubeconfig=${{ needs.deploy.outputs.cluster_kube_config }}"
       playbook: "new_build.yaml"
+      ansible_user: "ansible"
     secrets: inherit
 
   run_terraform_destroy:
     needs:
       - deploy
-      - call_post_deploy_vsphere_workflow
+      - call_post_deploy_rancher_workflow
     runs-on: arc-runners
-    if: ${{ always() && ((needs.deploy.steps.collect-artifacts.outcome == 'failure') || (needs.call_post_deploy_vsphere_workflow.result == 'failure')) }}
+    if: ${{ always() && ((needs.deploy.steps.collect-artifacts.outcome == 'failure') || (needs.call_post_deploy_rancher_workflow.result == 'failure')) }}
     env:
       VAULT_ADDR: ${{ vars.VAULT_ADDR }}
       VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
