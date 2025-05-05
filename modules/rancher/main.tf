@@ -77,6 +77,7 @@ resource "rancher2_cluster_v2" "cluster" {
       # cni = var.cluster_cni
       tls_san = var.tls_san
       selinux = true
+      serialize_image_pulls = var.serialize_image_pulls
       enable-controller-manager-metrics = true  
       etcd-expose-metrics            = true
       kubelet-arg: [ "cloud-provider=external" ]

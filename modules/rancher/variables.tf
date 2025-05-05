@@ -171,3 +171,9 @@ variable "tls_san" {
   description = "List of SANs for the TLS certificate"
   default     = []
 }
+
+variable "serialize_image_pulls" {
+  type        = bool
+  description = "Whether to serialize image pulls"
+  default     = false
+}
