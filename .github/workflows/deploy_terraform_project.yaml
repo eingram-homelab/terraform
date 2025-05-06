@@ -172,6 +172,11 @@ jobs:
         if: steps.check-projects.outputs.project_type == 'rancher'
         continue-on-error: true
         run: |
+          # Install HashiCorp Vault
+          wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+          sudo apt update && sudo apt install -y vault
+
           dir=${{ steps.check-projects.outputs.project }}
           echo "Collecting artifacts from $dir"
           echo project_name=$(basename $dir) >> $GITHUB_OUTPUT
@@ -193,7 +198,8 @@ jobs:
           # Check if cluster_kube_config output exists
           echo "Getting cluster kubeconfig"
           if terraform output -json cluster_kube_config &>/dev/null; then
-            cluster_kube_config=$(terraform output -json cluster_kube_config | jq -r '.' | base64)
+            cluster_kube_config=$(terraform output -json cluster_kube_config | jq -r '.')
+            vault write secret/kubernetes/${cluster_name} kubeconfig="${cluster_kube_config}"
             if [ -z "$cluster_kube_config" ]; then
               echo "Warning: Cluster kube config output is empty or null"
               exit 1
@@ -218,7 +224,7 @@ jobs:
 
           # Create outputs
           echo "cluster_name=$cluster_name" >> $GITHUB_OUTPUT
-          echo "cluster_kube_config=$cluster_kube_config" >> $GITHUB_OUTPUT
+          # echo "cluster_kube_config=$cluster_kube_config" >> $GITHUB_OUTPUT
           echo "cluster_lb_ip=$cluster_lb_ip" >> $GITHUB_OUTPUT
 
   call_post_deploy_vsphere_workflow:
