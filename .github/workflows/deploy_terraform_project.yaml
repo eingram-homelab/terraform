@@ -173,7 +173,7 @@ jobs:
         continue-on-error: true
         run: |
           # Install HashiCorp Vault
-          sudo apt update && sudo apt install -y wget
+          sudo apt update && sudo apt install -y ca-certificates wget
           wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
           echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
           sudo apt install -y vault
@@ -245,7 +245,7 @@ jobs:
     uses: eingram-homelab/ansible-col-homelab/.github/workflows/run_playbook.yaml@main
     with:
       limit: "localhost"
-      extra_vars: "cluster=${{ needs.deploy.outputs.ansible_limit }} lb_ip=${{ needs.deploy.outputs.cluster_lb_ip }} kubeconfig=${{ needs.deploy.outputs.cluster_kube_config }}"
+      extra_vars: "cluster=${{ needs.deploy.outputs.ansible_limit }} lb_ip=${{ needs.deploy.outputs.cluster_lb_ip }}"
       playbook: "new_build.yaml"
       ansible_user: "ansible"
     secrets: inherit
