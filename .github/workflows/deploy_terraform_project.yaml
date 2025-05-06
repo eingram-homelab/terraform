@@ -14,9 +14,11 @@ jobs:
     runs-on: arc-runners
     outputs:
       project_name: ${{ steps.collect-artifacts.outputs.project_name }}
-      project_type: ${{ steps.collect-artifacts.outputs.project_type }}
+      project_type: ${{ steps.check-projects.outputs.project_type }}
       ansible_limit: ${{ steps.collect-artifacts.outputs.ansible_limit }}
       ansible_user: ${{ steps.collect-artifacts.outputs.ansible_user }}
+      cluster_name: ${{ steps.collect-artifacts.outputs.cluster_name }}
+      cluster_lb_ip: ${{ steps.collect-artifacts.outputs.cluster_lb_ip }}
     env:
       VAULT_ADDR: ${{ vars.VAULT_ADDR }}
       VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
