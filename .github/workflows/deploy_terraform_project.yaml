@@ -278,7 +278,7 @@ jobs:
     if: needs.deploy.outputs.project_type == 'rancher'
     uses: eingram-homelab/ansible-col-homelab/.github/workflows/run_playbook.yaml@develop
     with:
-      limit: "all"
+      limit: "localhost"
       extra_vars: "cluster=${{ needs.deploy.outputs.cluster_name }} lb_ip=${{ needs.deploy.outputs.cluster_lb_ip }}"
       playbook: "post_terraform_rancher2.yaml"
       ansible_user: "ansible"
