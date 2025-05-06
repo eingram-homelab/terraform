@@ -280,7 +280,7 @@ jobs:
     with:
       limit: "all"
       extra_vars: "cluster=${{ needs.deploy.outputs.cluster_name }} lb_ip=${{ needs.deploy.outputs.cluster_lb_ip }}"
-      playbook: "new_build.yaml"
+      playbook: "post_terraform_rancher2.yaml"
       ansible_user: "ansible"
     secrets: inherit
 
