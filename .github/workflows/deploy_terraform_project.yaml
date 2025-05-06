@@ -193,7 +193,7 @@ jobs:
           # Check if cluster_kube_config output exists
           echo "Getting cluster kubeconfig"
           if terraform output -json cluster_kube_config &>/dev/null; then
-            cluster_kube_config=$(terraform output -json cluster_kube_config | jq -r '. | base64')
+            cluster_kube_config=$(terraform output -json cluster_kube_config | jq -r '.' | base64)
             if [ -z "$cluster_kube_config" ]; then
               echo "Warning: Cluster kube config output is empty or null"
               exit 1
