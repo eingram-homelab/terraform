@@ -44,7 +44,7 @@ jobs:
             echo ${projects[@]}
             unique_project=$(echo "$projects" | sort -u)
             echo $unique_project
-            type=$(echo "$dir" | cut -d'/' -f2)
+            type=$(echo "$unique_project" | cut -d'/' -f2)
             echo "Project type: $type"
             echo project_type=$type >> $GITHUB_OUTPUT
             if [ $(echo "$unique_project" | wc -l) -gt 1 ]; then
