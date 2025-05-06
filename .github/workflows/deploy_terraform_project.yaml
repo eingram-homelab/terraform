@@ -310,16 +310,17 @@ jobs:
       - name: Generate backend configuration
         run: |
           dir=${{ steps.check-projects.outputs.project }}
+          sudo rm -f "$dir/backend.tf"
+          echo "Generated backend.tf for $dir"
           cat > "$dir/backend.tf" <<EOF
           terraform {
             backend "gcs" {
               bucket      = "yc-srv1-tfstate"
               credentials = "/tmp/cred.json"
-              prefix      = "terraform/state/$(echo "$dir" | cut -d'/' -f3)-$(basename "$dir")"
+              prefix      = "terraform/state/$(echo "$dir" | cut -d'/' -f3)"
             }
           }
           EOF
-          echo "Generated backend.tf for $dir"
 
       - name: Run terraform init
         run: |
