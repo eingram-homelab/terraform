@@ -178,6 +178,7 @@ jobs:
           cd "$dir"
           
           # Check if output exists
+          echo "Getting cluster name"
           if terraform output -json cluster_name &>/dev/null; then
             cluster_name=$(terraform output -json cluster_name | jq -r '. // empty')
             if [ -z "$cluster_name" ]; then
@@ -190,6 +191,7 @@ jobs:
           fi
 
           # Check if cluster_kube_config output exists
+          echo "Getting cluster kubeconfig"
           if terraform output -json cluster_kube_config &>/dev/null; then
             cluster_kube_config=$(terraform output -json cluster_kube_config | jq -r '. // empty')
             if [ -z "$cluster_kube_config" ]; then
@@ -201,6 +203,8 @@ jobs:
             exit 1
           fi
           
+          # Check if cluster_rke_config output exists
+          echo "Getting cluster load balancer IP"
           if terraform output -json cluster_rke_config &>/dev/null; then
             cluster_lb_ip=$(terraform output cluster_rke_config | grep -oE '10.10.+')
             if [ -z "$cluster_lb_ip" ]; then
