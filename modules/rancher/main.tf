@@ -80,7 +80,7 @@ resource "rancher2_cluster_v2" "cluster" {
       serialize_image_pulls = var.serialize_image_pulls
       enable-controller-manager-metrics = true  
       etcd-expose-metrics            = true
-      kubelet-arg: [ "cloud-provider=external" ]
+      kubelet-arg: [ "cloud-provider=external", "provider-id=vsphere://${var.cluster_name}" ]
       kube-controller-manager-arg: [ "cloud-provider=external" ]
       kube-apiserver-arg: [ "cloud-provider=external" ]
     })
