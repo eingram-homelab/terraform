@@ -20,7 +20,7 @@ resource "rancher2_cloud_credential" "vsphere" {
   vsphere_credential_config {
     password = var.vsphere_password
     username = var.vsphere_username
-    vcenter = var.vsphere_vcenter
+    vcenter  = var.vsphere_vcenter
   }
 }
 
@@ -28,21 +28,21 @@ resource "rancher2_cloud_credential" "vsphere" {
 resource "rancher2_machine_config_v2" "cp_config" {
   generate_name = "cp"
   vsphere_config {
-    clone_from = var.vsphere_template
+    clone_from    = var.vsphere_template
     creation_type = "template"
-    cpu_count   = var.control_plane_cpu
-    memory_size = var.control_plane_memory
-    disk_size   = var.control_plane_disk_size
-    datacenter  = var.vsphere_datacenter
-    datastore   = var.vsphere_datastore
-    folder      = var.vsphere_folder
-    network     = var.vsphere_network
-    pool        = var.vsphere_resource_pool
-    tags        = var.vsphere_tags
-    cfgparam    = var.vsphere_cfgparam
+    cpu_count     = var.control_plane_cpu
+    memory_size   = var.control_plane_memory
+    disk_size     = var.control_plane_disk_size
+    datacenter    = var.vsphere_datacenter
+    datastore     = var.vsphere_datastore
+    folder        = var.vsphere_folder
+    network       = var.vsphere_network
+    pool          = var.vsphere_resource_pool
+    tags          = var.vsphere_tags
+    cfgparam      = var.vsphere_cfgparam
     cloud_config = templatefile("${abspath(path.module)}/templates/cloud-init.tftmpl", {
       salt_password = var.salt_password
-      ssh_key     = var.ssh_key
+      ssh_key       = var.ssh_key
     })
   }
 }
@@ -51,38 +51,39 @@ resource "rancher2_machine_config_v2" "cp_config" {
 resource "rancher2_machine_config_v2" "worker_config" {
   generate_name = "worker"
   vsphere_config {
-    clone_from = var.vsphere_template
+    clone_from    = var.vsphere_template
     creation_type = "template"
-    cpu_count   = var.worker_cpu
-    memory_size = var.worker_memory
-    disk_size = var.worker_disk_size
-    datacenter  = var.vsphere_datacenter
-    datastore   = var.vsphere_datastore
-    folder      = var.vsphere_folder
-    network     = var.vsphere_network
-    pool        = var.vsphere_resource_pool
+    cpu_count     = var.worker_cpu
+    memory_size   = var.worker_memory
+    disk_size     = var.worker_disk_size
+    datacenter    = var.vsphere_datacenter
+    datastore     = var.vsphere_datastore
+    folder        = var.vsphere_folder
+    network       = var.vsphere_network
+    pool          = var.vsphere_resource_pool
   }
 }
 
 # Create a new rancher v2 RKE2 Custom Cluster
 resource "rancher2_cluster_v2" "cluster" {
-  name               = var.cluster_name
-  kubernetes_version = var.kubernetes_version
+  name                  = var.cluster_name
+  kubernetes_version    = var.kubernetes_version
   enable_network_policy = false
-  
+
   # RKE2/K3s cluster config
   rke_config {
     machine_global_config = yamlencode({
       "disable" = length(var.disabled_features) > 0 ? var.disabled_features : []
       # cni = var.cluster_cni
-      tls_san = var.tls_san
-      selinux = true
-      serialize_image_pulls = var.serialize_image_pulls
-      enable-controller-manager-metrics = true  
-      etcd-expose-metrics            = true
-      kubelet-arg: [ "cloud-provider=external", "provider-id=vsphere://${var.cluster_name}" ]
-      kube-controller-manager-arg: [ "cloud-provider=external" ]
-      kube-apiserver-arg: [ "cloud-provider=external" ]
+      tls_san                           = var.tls_san
+      selinux                           = true
+      serialize_image_pulls             = var.serialize_image_pulls
+      enable-controller-manager-metrics = true
+      etcd-expose-metrics               = true
+      kube-controller-manager-arg : ["bind-address=0.0.0.0", "terminated-pod-gc-threshold=10"]
+      kube-proxy-arg : ["metrics-bind-address=0.0.0.0"]
+      kube-scheduler-arg : ["bind-address=0.0.0.0"]
+      kubelet-arg : ["cloud-provider=external", "provider-id=vsphere://${var.cluster_name}", "container-log-max-files=4", "container-log-max-size=50Mi", "image-gc-high-threshold=50", "image-gc-low-threshold=40"]
     })
 
     # registries {
@@ -94,11 +95,11 @@ resource "rancher2_cluster_v2" "cluster" {
       content {
         name                         = "cp"
         cloud_credential_secret_name = rancher2_cloud_credential.vsphere.id
-        control_plane_role          = true
-        etcd_role                   = true
-        worker_role                 = true
-        quantity                    = var.control_plane_node_count
-        drain_before_delete = true
+        control_plane_role           = true
+        etcd_role                    = true
+        worker_role                  = true
+        quantity                     = var.control_plane_node_count
+        drain_before_delete          = true
 
         machine_config {
           kind = rancher2_machine_config_v2.cp_config.kind
@@ -112,11 +113,11 @@ resource "rancher2_cluster_v2" "cluster" {
       content {
         name                         = "worker"
         cloud_credential_secret_name = rancher2_cloud_credential.vsphere.id
-        control_plane_role          = false
-        etcd_role                   = false
-        worker_role                 = true
-        quantity                    = var.worker_node_count
-        drain_before_delete = true
+        control_plane_role           = false
+        etcd_role                    = false
+        worker_role                  = true
+        quantity                     = var.worker_node_count
+        drain_before_delete          = true
 
         machine_config {
           kind = rancher2_machine_config_v2.worker_config.kind

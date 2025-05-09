@@ -7,13 +7,13 @@ output "cluster_name" {
 
 output "cluster_id" {
   description = "Cluster ID"
-  value = rancher2_cluster_v2.cluster.id
+  value       = rancher2_cluster_v2.cluster.id
 }
 
 output "cluster_kube_config" {
   description = "Kube Config"
-  value     = rancher2_cluster_v2.cluster.kube_config
-  sensitive = true
+  value       = rancher2_cluster_v2.cluster.kube_config
+  sensitive   = true
 }
 
 output "cluster_rke_config" {
