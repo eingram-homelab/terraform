@@ -1,4 +1,4 @@
-# Output the cluster name, ID and kube_config
+# Output the cluster name, ID and kube_config 
 
 output "cluster_name" {
   description = "Cluster Name"
