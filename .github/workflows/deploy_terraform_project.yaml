@@ -243,7 +243,8 @@ jobs:
             # Check if cluster_rke_config output exists
             echo "Getting cluster load balancer IP"
             if terraform output -json cluster_rke_config &>/dev/null; then
-              cluster_lb_ip=$(terraform output cluster_rke_config | grep -oE '10.10.+')
+              ip=$(terraform output cluster_rke_config | grep -oE '10.10.+')
+              cluster_lb_ip=$ip-"${ip%.*}.$((${ip##*.}+1))"
               if [ -z "$cluster_lb_ip" ]; then
                 echo "Warning: Cluster load balancer IP output is empty or null"
                 exit 1
