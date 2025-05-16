@@ -6,7 +6,7 @@ on:
       - main
       - develop
     paths:
-      - 'projects/**/**'
+      - 'projects/**/**/main.tf'
 
 jobs:
   deploy:
@@ -35,7 +35,7 @@ jobs:
         uses: tj-actions/changed-files@v46.0.5
         with:
           files: |
-            projects/**/**/*.tf
+            projects/**/**/main.tf
 
       - name: Ensure only one project is changed
         id: check-projects
