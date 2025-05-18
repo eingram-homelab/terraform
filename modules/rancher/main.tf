@@ -83,7 +83,7 @@ resource "rancher2_cluster_v2" "cluster" {
       kube-controller-manager-arg : ["bind-address=0.0.0.0", "terminated-pod-gc-threshold=10"]
       kube-proxy-arg : ["metrics-bind-address=0.0.0.0"]
       kube-scheduler-arg : ["bind-address=0.0.0.0"]
-      kubelet-arg : ["cloud-provider=external", "provider-id=vsphere://${var.cluster_name}", "container-log-max-files=4", "container-log-max-size=50Mi", "image-gc-high-threshold=50", "image-gc-low-threshold=40"]
+      kubelet-arg : ["cloud-provider=external", "container-log-max-files=4", "container-log-max-size=50Mi", "image-gc-high-threshold=50", "image-gc-low-threshold=40"]
     })
 
     # registries {
