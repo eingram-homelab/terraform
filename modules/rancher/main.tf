@@ -61,6 +61,12 @@ resource "rancher2_machine_config_v2" "worker_config" {
     folder        = var.vsphere_folder
     network       = var.vsphere_network
     pool          = var.vsphere_resource_pool
+    tags          = var.vsphere_tags
+    cfgparam      = var.vsphere_cfgparam
+    cloud_config = templatefile("${abspath(path.module)}/templates/cloud-init.tftmpl", {
+      salt_password = var.salt_password
+      ssh_key       = var.ssh_key
+    })
   }
 }
 
