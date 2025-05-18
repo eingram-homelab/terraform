@@ -32,7 +32,6 @@ users:
   - ${ssh_key}
 runcmd:
 - swapoff -a
-- setenforce 0
 - parted /dev/sda resizepart 3 100%
 - pvresize /dev/sda3
 - lvextend -r -l +100%FREE /dev/mapper/rl-root
