@@ -109,7 +109,7 @@ module "vm" {
   # vm_folder_name = "WindowsHL"
 
   # Set domain or workgroup
-  # domain = "homelab.local"
+  domain = "local.lan"
   # workgroup = "WORKGROUP"
 
   # Uncomment domain_* for domain only
