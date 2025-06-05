@@ -144,7 +144,7 @@ jobs:
             echo project_name=$(basename $dir) >> $GITHUB_OUTPUT
 
             if [[ $project_name == *"linux"* ]]; then
-
+              echo "Found linux project"
               #################
               # CREATE OUTPUT #
               #################
