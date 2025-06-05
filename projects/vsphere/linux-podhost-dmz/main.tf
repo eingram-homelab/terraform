@@ -1,4 +1,4 @@
-# Modify this line to trigger build 
+# Modify this line to trigger build
 
 provider "vault" {
 }
