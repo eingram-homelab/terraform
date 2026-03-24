@@ -178,19 +178,19 @@ variable "serialize_image_pulls" {
   default     = false
 }
 
-variable "kubelet_args" {
+variable "kubelet_arg" {
   type        = list(string)
   description = "List of kubelet arguments"
   default     = []
 }
 
-variable "kube_apiserver_args" {
+variable "kube_apiserver_arg" {
   type        = list(string)
   description = "List of kube-apiserver arguments"
   default     = []
 }
 
-variable "etcd_args" {
+variable "etcd_arg" {
   type        = list(string)
   description = "List of etcd arguments"
   default     = []
