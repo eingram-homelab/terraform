@@ -18,6 +18,7 @@ jobs:
       ansible_user: ${{ steps.collect-artifacts.outputs.ansible_user }}
       cluster_name: ${{ steps.collect-artifacts.outputs.cluster_name }}
       cluster_lb_ip: ${{ steps.collect-artifacts.outputs.cluster_lb_ip }}
+      deploy_tag: ${{ steps.tag-deployment.outputs.tag }}
     env:
       VAULT_ADDR: ${{ vars.VAULT_ADDR }}
       VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
@@ -72,7 +73,7 @@ jobs:
           node-version: '20'
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@main
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.11.3
 
@@ -122,6 +123,19 @@ jobs:
           echo "Running terraform apply for $dir"
           cd "$dir"
           terraform apply --auto-approve
+
+      - name: Tag deployment
+        id: tag-deployment
+        if: success()
+        run: |
+          project_name=$(basename "${{ steps.check-projects.outputs.project }}")
+          tag="deploy/${project_name}-$(date -u +%Y%m%d%H%M%S)-${GITHUB_SHA::7}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$tag"
+          git push origin "$tag"
+          echo "tag=$tag" >> $GITHUB_OUTPUT
+          echo "Deployment tagged: $tag"
 
       - name: Install jq
         run: |
@@ -315,7 +329,7 @@ jobs:
           node-version: '20'
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@main
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.11.3
 

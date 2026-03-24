@@ -57,7 +57,7 @@ module "rancher" {
   ssh_key               = data.vault_generic_secret.ssh_pub_key.data["ssh_pub_key"]
   tls_san               = ["k3s-clus1-dev.local.lan", "10.10.0.209"]
   serialize_image_pulls = true
-  kubelet_args           = ["cloud-provider=external",
+  kubelet_arg           = ["cloud-provider=external",
                             "container-log-max-files=4",
                             "container-log-max-size=50Mi",
                             "image-gc-high-threshold=50",
@@ -68,6 +68,6 @@ module "rancher" {
                             "eviction-soft=memory.available<200Mi,nodefs.available<15%,imagefs.available<20%",
                             "eviction-soft-grace-period=memory.available=1m30s,nodefs.available=1m30s,imagefs.available=1m30s"
                           ]
-  kube_apiserver_args     = ["max-requests-inflight=400", "max-mutating-requests-inflight=200", "min-request-timeout=300"]
-  etcd_args               = ["auto-compaction-mode=periodic", "auto-compaction-retention=1h", "snapshot-count=5000", "quota-backend-bytes=2147483648"]
+  kube_apiserver_arg    = ["max-requests-inflight=400", "max-mutating-requests-inflight=200", "min-request-timeout=300"]
+  etcd_arg              = ["auto-compaction-mode=periodic", "auto-compaction-retention=1h", "snapshot-count=5000", "quota-backend-bytes=2147483648"]
 }

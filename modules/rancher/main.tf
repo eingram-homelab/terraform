@@ -89,9 +89,9 @@ resource "rancher2_cluster_v2" "cluster" {
       kube-controller-manager-arg : ["bind-address=0.0.0.0", "terminated-pod-gc-threshold=10"]
       kube-proxy-arg : ["metrics-bind-address=0.0.0.0"]
       kube-scheduler-arg : ["bind-address=0.0.0.0"]
-      kubelet-arg : var.kubelet_args
-      kube-apiserver-arg : var.kube_apiserver_args
-      etcd-arg : var.etcd_args
+      kubelet-arg : var.kubelet_arg
+      kube-apiserver-arg : var.kube_apiserver_arg
+      etcd-arg : var.etcd_arg
     })
 
     # registries {
