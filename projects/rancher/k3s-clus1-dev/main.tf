@@ -24,7 +24,7 @@ data "vault_generic_secret" "ssh_pub_key" {
 }
 
 module "rancher" {
-  source                        = "../../../modules/rancher"
+  source                        = "github.com/eingram-homelab/tf-mod-rancher"
   rancher_api_url               = "https://rancher.local.lan"
   rancher_access_key            = data.vault_generic_secret.token.data["token"]
   rancher_secret_key            = data.vault_generic_secret.secret.data["secret"]

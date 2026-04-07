@@ -6,18 +6,9 @@ Infrastructure-as-code for automating VM provisioning and Kubernetes cluster man
 ## Structure
 
 ```
-modules/       Reusable modules
 projects/      Environment-specific deployments
 ```
 
-## Modules
-
-| Module | Description |
-|---|---|
-| `modules/rancher` | Rancher v2 RKE2/K3s cluster provisioning on vSphere (machine configs, cluster, node pools) |
-| `modules/vsphere/vm` | vSphere Linux VM provisioning |
-| `modules/gcp` | GCP resource provisioning |
-| `modules/proxmox_linux` | Proxmox Linux VM provisioning |
 
 ## Projects
 
