@@ -1,5 +1,8 @@
-# Example terraform.tfvars file
-# Rename to terraform.tfvars and update with your values
-
-app_name        = "test"
-app_description = "test"
+az_app_name = "certbot-googledns"
+gcp_services_list = [
+  "iam.googleapis.com",
+  "iamcredentials.googleapis.com"
+]
+gcp_wip           = "certbot-dns-auth"
+gcp_wip_provider  = "azure-provider"
+gcp_sa_account_id = "certbot-dns"

@@ -22,8 +22,3 @@ output "disk" {
   description = "Disks of the deployed VM"
   value       = module.vm.disk
 }
-
-output "domain" {
-  description = "Domain suffix of the VM in vSphere"
-  value       = module.vm.domain
-}

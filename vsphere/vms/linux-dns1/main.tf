@@ -1,5 +1,3 @@
-# Edit this line to trigger build 
-
 provider "vault" {
 }
 
@@ -45,37 +43,19 @@ module "vm" {
   # All lists must have same # of elements
 
   vsphere_datastore_list = [
-    # "vsanDatastore",
-    "vsanDatastore",
     "vsanDatastore"
-    # XN_iSCSI_SSD2,
-    # XN_iSCSI_SSD2,
   ]
   vsphere_network_list = [
-    # "DPG-Lab-LAN1",
-    "DPG-Lab-LAN1",
-    "DPG-Lab-LAN1"
-    # "DPG-Services",
-    # "DPG-Services"
+    "DPG-Services"
   ]
   vm_name_list = [
-    # "k3s-mgmt-cp1",
-    "test",
-    "test2"
-    # k3s2,
-    # k3s3
+    "dns1"
   ]
   ip_address_list = [
-    # "192.168.1.222",
-    # "192.168.1.232"
-    # 10.10.0.52,
-    # 10.10.0.53
+    "192.168.1.251"
   ]
   ip_gateway_list = [
-    # "192.168.1.1",
-    # "192.168.1.1"
-    # 10.10.0.1,
-    # 10.10.0.1
+    "192.168.1.1"
   ]
 
   # Global options apply to all VMs
@@ -89,12 +69,11 @@ module "vm" {
   ]
 
   vm_tags = [
-    "dev"
+    "prod"
   ]
-
+  
   # Linux images
-  # vsphere_template = TMP-RHEL85_Packer
-  vsphere_template = "TMP-Rocky9_Packer"
+  vsphere_template = "TMP-Rocky10_Packer"
 
   # Windows images
   # vsphere_template = "TMP-Win2022Core_Packer"
@@ -105,22 +84,21 @@ module "vm" {
   is_windows_image = false
 
   # Set vm folder location
-  # vm_folder_name = "Rancher"
+  vm_folder_name = "Linux"
   # vm_folder_name = "WindowsWG"
   # vm_folder_name = "WindowsHL"
-  vm_folder_name = "Linux"
 
   # Set domain or workgroup
-  # domain = "homelab.local"
+    domain = "local.lan"
   # workgroup = "WORKGROUP"
 
   # Uncomment domain_* for domain only
   # domain_user = data.vault_generic_secret.hladmin_username.data["hladmin_username"]
   # domain_password = data.vault_generic_secret.hladmin_password.data["hladmin_password"]
-
+  
   # Used for Windows and Linux
   admin_password = data.vault_generic_secret.win_password.data["win_password"]
-  ssh_key        = data.vault_generic_secret.ssh_pub_key.data["ssh_pub_key"]
+  ssh_key = data.vault_generic_secret.ssh_pub_key.data["ssh_pub_key"]
 
   # Only for Windows Workgroup to set admin user
   run_once_command_list = [
@@ -128,28 +106,27 @@ module "vm" {
     # "cmd /c powershell.exe Add-LocalGroupMember -Group 'Administrators' -Member 'ansible'"
   ]
 
-  vm_ram               = 8192
-  vm_cpu               = 2
-  vm_base_disk_size_gb = [100] # Comment to use template size
-  vm_efi_secure        = false
+  vm_ram        = 1024
+  vm_cpu        = 1
+  vm_base_disk_size_gb = [62] # Comment to use template size | minumum 62
+  vm_efi_secure = false
 
   # Set these options for k8s nodes using vSphere CSI
-  # enable_disk_uuid = true
-  # vm_user_id = "vsphere.local\\csi"
-  # vm_role_name = "CNS-VM"
-  # vm_permissions_propagate = false
+  enable_disk_uuid = true
+  vm_user_id = "vsphere.local\\csi"
+  vm_role_name = "CNS-VM"
+  vm_permissions_propagate = false
 
   # vSAN - No Fault Tolerance - Comment for Fault Tolerance (will use default for datastore)
   # vsphere_storage_policy_id = "26d71bd1-1bd5-4721-9bfa-ceb3b22e2e30"
-  vm_storage_policy = "vSAN - No Fault Tolerance"
+  vm_storage_policy = "vSAN Default Storage Policy"
 
   # VMFS Thin Provisioned
   # vsphere_storage_policy_id = "991380e9-8714-4ec0-9c8c-944aa740e8a8"
 
   dns_server_list = [
-    # "10.10.0.10"
-    # "192.168.1.250",
-    # "192.168.1.251"
+    "192.168.1.251",
+    "192.168.1.250"
   ]
 
   data_disk = {

@@ -1,4 +1,4 @@
-resource "google_project_iam_custom_role" "certbot_dns" {
+resource "google_project_iam_custom_role" "gcp_custom_role" {
   role_id     = "certbot_dns"
   title       = "Certbot DNS Role"
   description = "Custom role for certbot-google-dns plugin"
