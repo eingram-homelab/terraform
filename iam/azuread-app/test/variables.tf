@@ -8,3 +8,9 @@ variable "app_description" {
   type        = string
   default     = ""
 }
+
+variable "tenant_id" {
+  description = "AzureAD Tenent ID"
+  type = string
+  default = ""
+}
