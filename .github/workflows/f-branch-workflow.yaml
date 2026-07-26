@@ -1,0 +1,12 @@
+---
+name: Feature Branch Workflow | Terraform
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  validate:
+    name: Validate Terraform Files
+    uses: eingram-homelab/reusable-workflows/.github/workflows/_flattened-terraform-f-workflow.yaml@main
