@@ -1,3 +1,5 @@
+gcp_project = "proj-yc-srv1"
+
 gcp_wip = {
   id           = "github-actions-wip"
   display_name = "GitHub Actions Pool"
