@@ -1,0 +1,19 @@
+---
+name: PR Workflow / Terraform
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  gha-checks:
+    name: Terraform PR Workflow Checks
+    uses: ./.github/workflows/_flattened-terraform-pr-workflow.yaml
+    with:
+      repository: ${{ github.repository }}
+      ref: ${{ github.head_ref || github.ref_name }}
