@@ -15,8 +15,11 @@ permissions:
   pull-requests: read
 
 jobs:
-  gha-checks:
-    name: Terraform PR Workflow Checks
+  flattened-terraform-pr-workflow:
+    name: Terraform PR Workflow
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     uses: eingram-homelab/reusable-workflows/.github/workflows/_flattened-terraform-pr-workflow.yaml@main
     with:
       repository: ${{ github.repository }}
