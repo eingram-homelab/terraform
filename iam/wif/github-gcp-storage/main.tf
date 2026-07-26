@@ -1,6 +1,6 @@
-data "google_project" "current" {
-  project_id = var.gcp_project
-}
+# data "google_project" "current" {
+#   project_id = var.gcp_project
+# }
 
 resource "google_storage_bucket_iam_member" "member" {
   depends_on = [module.gcp-wif]
@@ -11,7 +11,7 @@ resource "google_storage_bucket_iam_member" "member" {
 
 locals {
   gcp_service_account_iam_members = {
-    for repo in var.allowed_repositories : repo => "principalSet://iam.googleapis.com/projects/${data.google_project.current.number}/locations/global/workloadIdentityPools/${var.gcp_wip.id}/attribute.repository/${repo}"
+    for repo in var.allowed_repositories : repo => "principalSet://iam.googleapis.com/projects/433507715827/locations/global/workloadIdentityPools/${var.gcp_wip.id}/attribute.repository/${repo}"
   }
 }
 
