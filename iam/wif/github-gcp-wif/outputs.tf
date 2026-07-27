@@ -58,3 +58,12 @@ output "oidc_attribute_mapping" {
   description = "OIDC Attribute Mapping"
   value       = var.gcp_wip.attribute_mapping
 }
+
+output "github_actions_environment_variables" {
+  description = "Environment variables needed for GitHub Actions setup"
+  value = {
+    GCP_PROJECT_ID                 = var.gcp_project
+    GCP_WORKLOAD_IDENTITY_PROVIDER = "projects/${var.gcp_project}/locations/global/workloadIdentityPools/${var.gcp_wip.id}/providers/${var.gcp_wip.provider}"
+    GCP_SERVICE_ACCOUNT_EMAIL      = "${var.gcp_service_account.account_id}@${var.gcp_project}.iam.gserviceaccount.com"
+  }
+}
