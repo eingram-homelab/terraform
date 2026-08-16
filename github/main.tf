@@ -1,24 +1,5 @@
-terraform {
-  required_version = ">= 1.5.0"
-  required_providers {
-    github = {
-      source  = "integrations/github"
-      version = "~> 5.0"
-    }
-  }
-}
-
-provider "vault" {
-  # Configuration options
-}
-
 data "vault_generic_secret" "terraform" {
   path = "secret/github/pat"
-}
-
-provider "github" {
-  owner = var.github_owner
-  token = data.vault_generic_secret.terraform.data["terraform"]
 }
 
 module "github-repo" {

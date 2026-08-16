@@ -6,7 +6,6 @@ resource "github_repository" "repo" {
   allow_update_branch    = false
   auto_init              = true
   delete_branch_on_merge = true
-  vulnerability_alerts   = true
   name                   = var.repo_name
   visibility             = var.repo_visibility
   security_and_analysis {
@@ -49,6 +48,11 @@ resource "github_repository_ruleset" "default_branch" {
       required_review_thread_resolution = false
     }
   }
+}
+
+resource "github_repository_vulnerability_alerts" "alert" {
+  repository = github_repository.repo.name
+  enabled    = true
 }
 
 resource "null_resource" "disable_external_pr" {
