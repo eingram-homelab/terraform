@@ -9,4 +9,4 @@ on:
 jobs:
   flattened-terraform-f-workflow:
     name: Terraform Feature Branch Workflow
-    uses: eingram-homelab/reusable-workflows/.github/workflows/_flattened-terraform-f-workflow.yaml@main
+    uses: eingram-homelab/reusable-workflows/.github/workflows/_flattened-terraform-f-workflow.yaml@add-plan-to-pr
