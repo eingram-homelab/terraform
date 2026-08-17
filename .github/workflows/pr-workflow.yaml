@@ -12,7 +12,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read
 
 jobs:
   flattened-terraform-pr-workflow:
@@ -20,6 +19,7 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
+      pull-requests: 'write'
     uses: eingram-homelab/reusable-workflows/.github/workflows/_flattened-terraform-pr-workflow.yaml@main
     with:
       repository: ${{ github.repository }}
