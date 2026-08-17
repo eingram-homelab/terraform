@@ -16,6 +16,14 @@ resource "github_repository" "repo" {
       status = "disabled"
     }
   }
+  dynamic "template" {
+    for_each = var.template_repo != "" ? [1] : []
+    content {
+      owner                = template.value.owner
+      repository           = template.value.repository
+      include_all_branches = template.value.include_all_branches
+    }
+  }
 }
 
 resource "github_branch_default" "default" {

@@ -25,3 +25,15 @@ variable "required_approving_review_count" {
   type        = number
   default     = 0
 }
+
+variable "template_owner" {
+  description = "Owner of template repo."
+  type        = string
+  default     = ""
+}
+
+variable "template_repo" {
+  description = "Template repo name."
+  type        = string
+  default     = ""
+}
