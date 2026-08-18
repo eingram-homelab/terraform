@@ -1,4 +1,4 @@
-# This file contains the Terraform variables for the staging environment.
+# This file contains the Terraform variables for the staging environment. 
 github_owner    = "eingram-homelab"
 repo_name       = "test-repo"
 repo_visibility = "public"
