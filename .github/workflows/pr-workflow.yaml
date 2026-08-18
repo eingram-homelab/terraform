@@ -5,19 +5,39 @@ on:
   pull_request:
     branches:
       - main
+  push:
+    branches:
+      - main
 
 permissions:
   contents: read
 
 jobs:
   flattened-terraform-pr-workflow:
+    if: ${{ github.event_name == 'pull_request' }}
     name: Terraform PR Workflow
     permissions:
       contents: 'read'
       id-token: 'write'
+      pull-requests: 'write'
     uses: eingram-homelab/reusable-workflows/.github/workflows/_flattened-terraform-pr-workflow.yaml@tf-pr-wf
     with:
       repository: ${{ github.repository }}
       ref: ${{ github.head_ref || github.ref_name }}
     secrets:
       VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
+
+  # flattened-terraform-release-workflow:
+  #   needs: flattened-terraform-pr-workflow
+  #   if: ${{ github.event_name == 'push' }}
+  #   name: Terraform Release Workflow
+  #   permissions:
+  #     contents: 'read'
+  #     id-token: 'write'
+  #   uses: eingram-homelab/reusable-workflows/.github/workflows/_flattened-terraform-release-workflow.yaml@tf-pr-wf
+  #   with:
+  #     repository: ${{ github.repository }}
+  #     ref: ${{ github.head_ref || github.ref_name }}
+  #     run_id: ${{ github.run_id }}
+  #     artifact_name: ${{ needs.flattened-terraform-pr-workflow.outputs.artifact-name }}
+  #     environment: staging
