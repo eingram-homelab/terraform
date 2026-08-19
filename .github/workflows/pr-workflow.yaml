@@ -24,6 +24,7 @@ jobs:
     with:
       repository: ${{ github.repository }}
       ref: ${{ github.head_ref || github.ref_name }}
+      pull_request_number: ${{ github.event.pull_request.number }}
     secrets:
       VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
 
