@@ -1,0 +1,25 @@
+---
+name: Release Workflow / Terraform
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - main
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  flattened-terraform-release-workflow:
+    name: Terraform Release Workflow
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    uses: eingram-homelab/reusable-workflows/.github/workflows/_flattened-terraform-release-workflow.yaml@main
+    with:
+      repository: ${{ github.repository }}
+      ref: ${{ github.head_ref || github.ref_name }}
+    secrets:
+      VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
