@@ -1,68 +1,30 @@
 # Azure Configuration
-resource "azuread_application" "github_actions" {
-  display_name = "GitHub Actions - Terraform"
-  description  = "Application for GitHub Actions OIDC authentication"
+data "azurerm_resource_group" "rg" {
+  name = var.resource_group_name
 }
 
-resource "azuread_service_principal" "github_actions" {
-  client_id = azuread_application.github_actions.client_id
+resource "azurerm_user_assigned_identity" "github_terraform" {
+  name                = var.user_assigned_identity_name
+  resource_group_name = data.azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
 }
 
-resource "azuread_application_federated_identity_credential" "github" {
-  for_each = toset(var.allowed_repositories)
+resource "azurerm_federated_identity_credential" "github_terraform" {
+  for_each = var.federated_identity_credentials
 
-  application_id = azuread_application.github_actions.id
-  display_name   = "GitHub ${each.value}"
-  description    = "Federated identity for ${each.value}"
-  audiences      = ["api://AzureADTokenExchange"]
-  issuer         = "https://token.actions.githubusercontent.com"
-  subject        = "repo:${each.value}:ref:refs/heads/main"
+  name                = each.value.display_name
+  resource_group_name = data.azurerm_resource_group.rg.name
+  parent_id           = azurerm_user_assigned_identity.github_terraform.id
+  audience            = each.value.audiences
+  issuer              = each.value.issuer
+  subject             = each.value.subject
 }
 
-resource "azurerm_role_assignment" "github_actions" {
-  scope                = var.azure_role_assignment.scope != null ? var.azure_role_assignment.scope : "/subscriptions/${var.azure_subscription_id}/resourceGroups/${var.azure_resource_group_name}"
+module "github-terraform-identity-role-assignment" {
+  source               = "../../../modules/azure-role-assignment"
+  scope                = var.azure_role_assignment.scope != null ? var.azure_role_assignment.scope : "/subscriptions/${var.azure_subscription_id}"
   role_definition_name = var.azure_role_assignment.role
-  principal_id         = azuread_service_principal.github_actions.object_id
+  subscription_id      = var.azure_subscription_id
+  resource_group_name  = data.azurerm_resource_group.rg.name
+  principal_id         = azurerm_user_assigned_identity.github_terraform.principal_id
 }
-
-resource "azurerm_role_assignment" "key_vault_admin" {
-  count                = var.azure_ad_directory_roles.azure_key_vault_administrator ? 1 : 0
-  scope                = "/subscriptions/${var.azure_subscription_id}/resourceGroups/${var.azure_resource_group_name}"
-  role_definition_name = "Key Vault Administrator"
-  principal_id         = azuread_service_principal.github_actions.object_id
-}
-
-# Azure AD Directory Roles for IAM object creation
-data "azuread_directory_role" "application_developer" {
-  count        = var.azure_ad_directory_roles.application_developer ? 1 : 0
-  display_name = "Application Developer"
-}
-
-resource "azuread_directory_role_member" "application_developer" {
-  count            = var.azure_ad_directory_roles.application_developer ? 1 : 0
-  role_object_id   = data.azuread_directory_role.application_developer[0].object_id
-  member_object_id = azuread_service_principal.github_actions.object_id
-}
-
-data "azuread_directory_role" "cloud_application_admin" {
-  count        = var.azure_ad_directory_roles.cloud_application_admin ? 1 : 0
-  display_name = "Cloud Application Administrator"
-}
-
-resource "azuread_directory_role_member" "cloud_application_admin" {
-  count            = var.azure_ad_directory_roles.cloud_application_admin ? 1 : 0
-  role_object_id   = data.azuread_directory_role.cloud_application_admin[0].object_id
-  member_object_id = azuread_service_principal.github_actions.object_id
-}
-
-data "azuread_directory_role" "directory_writers" {
-  count        = var.azure_ad_directory_roles.directory_writers ? 1 : 0
-  display_name = "Directory Writers"
-}
-
-resource "azuread_directory_role_member" "directory_writers" {
-  count            = var.azure_ad_directory_roles.directory_writers ? 1 : 0
-  role_object_id   = data.azuread_directory_role.directory_writers[0].object_id
-  member_object_id = azuread_service_principal.github_actions.object_id
-}
-
