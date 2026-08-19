@@ -1,4 +1,4 @@
-# This file contains the Terraform variables for the production environment. 
+# This file contains the Terraform variables for the production environment.
 github_owner    = "eingram-homelab"
 repo_name       = "test-repo"
 repo_visibility = "public"
