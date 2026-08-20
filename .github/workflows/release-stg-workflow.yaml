@@ -1,0 +1,30 @@
+---
+name: Release Staging Workflow / Terraform
+
+on:
+  workflow_run:
+    workflows: ["PR Workflow / Terraform"]
+    types:
+      - completed
+
+permissions:
+  contents: read
+  pull-requests: read
+  actions: read
+
+jobs:
+  flattened-terraform-release-workflow:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    name: Terraform Release Workflow
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    uses: eingram-homelab/reusable-workflows/.github/workflows/_flattened-terraform-release-workflow.yaml@deploy-stg
+    with:
+      repository: ${{ github.repository }}
+      ref: ${{ github.head_ref || github.ref_name }}
+      environment: staging
+      run_id: ${{ github.event.workflow_run.id }}
+    secrets:
+      VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
