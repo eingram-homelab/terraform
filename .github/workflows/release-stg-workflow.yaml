@@ -6,6 +6,12 @@ on:
     workflows: ["PR Workflow / Terraform"]
     types:
       - completed
+  workflow_dispatch:
+    inputs:
+      run-id:
+        description: "Run ID of the PR Workflow / Terraform run to apply"
+        required: true
+        type: string
 
 permissions:
   contents: read
