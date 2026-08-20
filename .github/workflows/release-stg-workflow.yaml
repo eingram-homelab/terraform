@@ -24,7 +24,6 @@ jobs:
       repository: ${{ github.repository }}
       ref: ${{ github.head_ref || github.ref_name }}
       environment: staging
-      run_id: ${{ github.event.workflow_run.id }}
+      run-id: ${{ github.event.workflow_run.id }}
     secrets:
       VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

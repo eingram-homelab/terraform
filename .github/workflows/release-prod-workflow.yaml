@@ -4,7 +4,7 @@ name: Release Production Workflow / Terraform
 on:
   workflow_dispatch:
     inputs:
-      run_id:
+      run-id:
         description: "Run ID of the PR Workflow / Terraform run to apply"
         required: true
         type: string
@@ -24,6 +24,6 @@ jobs:
       repository: ${{ github.repository }}
       ref: ${{ github.ref_name }}
       environment: production
-      run_id: ${{ inputs.run_id }}
+      run-id: ${{ inputs.run-id }}
     secrets:
       VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
