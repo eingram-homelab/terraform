@@ -21,9 +21,6 @@ permissions:
 jobs:
   flattened-terraform-release-workflow:
     name: Terraform Release Workflow
-    permissions:
-      contents: 'read'
-      id-token: 'write'
     uses: eingram-homelab/reusable-workflows/.github/workflows/_flattened-terraform-release-workflow.yaml@deploy-stg
     with:
       repository: ${{ github.repository }}
