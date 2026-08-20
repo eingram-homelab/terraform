@@ -20,7 +20,7 @@ permissions:
 jobs:
   resolve-run:
     if: ${{ github.event_name == 'push' }}
-    runs-on: ubuntu-latest
+    runs-on: arc-runners
     permissions:
       actions: read
       contents: read
