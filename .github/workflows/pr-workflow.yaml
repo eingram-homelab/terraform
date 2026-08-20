@@ -20,7 +20,7 @@ jobs:
       contents: 'read'
       id-token: 'write'
       pull-requests: 'write'
-    uses: eingram-homelab/reusable-workflows/.github/workflows/_flattened-terraform-pr-workflow.yaml@main
+    uses: eingram-homelab/reusable-workflows/.github/workflows/_flattened-terraform-pr-workflow.yaml@deploy-stg
     with:
       repository: ${{ github.repository }}
       ref: ${{ github.head_ref || github.ref_name }}
