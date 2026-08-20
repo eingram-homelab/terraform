@@ -4,7 +4,7 @@ name: Release Staging Workflow / Terraform
 on:
   push:
     branches:
-      - main
+      - test-release-branch
   workflow_dispatch:
     inputs:
       run-id:
