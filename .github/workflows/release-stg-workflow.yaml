@@ -2,10 +2,9 @@
 name: Release Staging Workflow / Terraform
 
 on:
-  workflow_run:
-    workflows: ["PR Workflow / Terraform"]
-    types:
-      - completed
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       run-id:
@@ -19,8 +18,35 @@ permissions:
   actions: read
 
 jobs:
+  resolve-run:
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      run-id: ${{ steps.find.outputs.run-id }}
+    steps:
+      - name: Find PR Workflow run for merge commit
+        id: find
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          run_id=$(gh run list \
+            --repo "${{ github.repository }}" \
+            --workflow "PR Workflow / Terraform" \
+            --commit "${{ github.sha }}" \
+            --json databaseId,conclusion \
+            --jq '[.[] | select(.conclusion == "success")][0].databaseId')
+          if [ -z "$run_id" ]; then
+            echo "No successful PR Workflow run found for ${{ github.sha }}" >&2
+            exit 1
+          fi
+          echo "run-id=$run_id" >> "$GITHUB_OUTPUT"
+
   flattened-terraform-release-workflow:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    needs: [resolve-run]
+    if: ${{ always() && github.event_name == 'workflow_dispatch' || needs.resolve-run.result == 'success' }}
     name: Terraform Release Workflow
     permissions:
       contents: 'read'
@@ -28,8 +54,8 @@ jobs:
     uses: eingram-homelab/reusable-workflows/.github/workflows/_flattened-terraform-release-workflow.yaml@deploy-stg
     with:
       repository: ${{ github.repository }}
-      ref: ${{ github.head_ref || github.ref_name }}
+      ref: ${{ github.ref_name }}
       environment: staging
-      run-id: ${{ github.event.workflow_run.id }}
+      run-id: ${{ github.event_name == 'workflow_dispatch' && inputs.run-id || needs.resolve-run.outputs.run-id }}
     secrets:
       VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
