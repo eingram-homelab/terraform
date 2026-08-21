@@ -4,7 +4,7 @@ name: Release Staging Workflow / Terraform
 on:
   push:
     branches:
-      - test-release-branch
+      - main
   workflow_dispatch:
     inputs:
       run-id:
@@ -22,7 +22,7 @@ permissions:
 jobs:
   flattened-terraform-release-workflow:
     name: Terraform Release Workflow
-    uses: eingram-homelab/reusable-workflows/.github/workflows/_flattened-terraform-release-workflow.yaml@deploy-stg
+    uses: eingram-homelab/reusable-workflows/.github/workflows/_flattened-terraform-release-workflow.yaml@main
     with:
       repository: ${{ github.repository }}
       ref: ${{ github.ref_name }}
