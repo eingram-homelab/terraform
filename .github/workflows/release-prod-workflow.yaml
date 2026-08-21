@@ -19,7 +19,7 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
-    uses: eingram-homelab/reusable-workflows/.github/workflows/_flattened-terraform-release-workflow.yaml@deploy-stg
+    uses: eingram-homelab/reusable-workflows/.github/workflows/_flattened-terraform-release-workflow.yaml@main
     with:
       repository: ${{ github.repository }}
       ref: ${{ github.ref_name }}
@@ -27,3 +27,4 @@ jobs:
       run-id: ${{ inputs.run-id }}
     secrets:
       VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
+      GH_TF_TOKEN: ${{ secrets.GH_TF_TOKEN }}
