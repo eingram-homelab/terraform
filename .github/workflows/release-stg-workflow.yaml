@@ -4,7 +4,7 @@ name: Release Staging Workflow / Terraform
 on:
   push:
     branches:
-      - main
+      - test-release-branch
   workflow_dispatch:
     inputs:
       run-id:
@@ -16,14 +16,12 @@ on:
 permissions:
   contents: read
   pull-requests: read
+  id-token: write
   actions: read
 
 jobs:
   flattened-terraform-release-workflow:
     name: Terraform Release Workflow
-    permissions:
-      contents: 'read'
-      id-token: 'write'
     uses: eingram-homelab/reusable-workflows/.github/workflows/_flattened-terraform-release-workflow.yaml@deploy-stg
     with:
       repository: ${{ github.repository }}
@@ -32,3 +30,4 @@ jobs:
       run-id: ${{ inputs.run-id }}
     secrets:
       VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
+      GH_TF_TOKEN: ${{ secrets.GH_TF_TOKEN }}
