@@ -1,11 +1,11 @@
 output "repo_name" {
   description = "The name of the GitHub repository."
-  value       = github_repository.repo.name
+  value       = { for name, repo in var.repos : name => github_repository.repo[name].name }
 }
 
 output "default_branch" {
   description = "The default branch of the GitHub repository."
-  value       = github_branch_default.default.branch
+  value       = { for name, repo in var.repos : name => github_branch_default.default[name].branch }
 }
 
 output "github_owner" {
