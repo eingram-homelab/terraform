@@ -1,4 +1,4 @@
-# This file contains the Terraform variables for the staging environment. new trigger
+# This file contains the Terraform variables for the staging environment.
 github_owner    = "eingram-homelab"
 repo_name       = "stg-repo"
 repo_visibility = "public"
