@@ -1,4 +1,5 @@
 resource "github_repository" "repo" {
+  for_each               = tomap(var.repos)
   allow_auto_merge       = false
   allow_merge_commit     = true
   allow_rebase_merge     = true
@@ -6,8 +7,8 @@ resource "github_repository" "repo" {
   allow_update_branch    = false
   auto_init              = true
   delete_branch_on_merge = true
-  name                   = var.repo_name
-  visibility             = var.repo_visibility
+  name                   = each.key
+  visibility             = each.value.visibility
   security_and_analysis {
     secret_scanning {
       status = "enabled"
@@ -17,30 +18,31 @@ resource "github_repository" "repo" {
     }
   }
   dynamic "template" {
-    for_each = var.template_repo != "" ? [1] : []
+    for_each = each.value.template_owner != "" && each.value.template_repo != "" ? [1] : []
     content {
-      owner                = template.value.owner
-      repository           = template.value.repository
-      include_all_branches = template.value.include_all_branches
+      owner      = each.value.template_owner
+      repository = each.value.template_repo
     }
   }
 }
 
 resource "github_branch_default" "default" {
-  repository = github_repository.repo.name
-  branch     = var.default_branch
+  for_each   = tomap(var.repos)
+  repository = github_repository.repo[each.key].name
+  branch     = each.value.default_branch
 }
 
 resource "github_repository_ruleset" "default_branch" {
+  for_each    = tomap(var.repos)
   name        = "Branch rules"
-  repository  = github_repository.repo.name
+  repository  = github_repository.repo[each.key].name
   target      = "branch"
   enforcement = "active"
 
   conditions {
     ref_name {
       exclude = []
-      include = ["refs/heads/${var.default_branch}"]
+      include = ["refs/heads/${each.value.default_branch}"]
     }
   }
 
@@ -49,7 +51,7 @@ resource "github_repository_ruleset" "default_branch" {
     non_fast_forward = true
 
     pull_request {
-      required_approving_review_count   = var.required_approving_review_count
+      required_approving_review_count   = each.value.required_approving_review_count
       dismiss_stale_reviews_on_push     = false
       require_code_owner_review         = false
       require_last_push_approval        = false
@@ -59,18 +61,20 @@ resource "github_repository_ruleset" "default_branch" {
 }
 
 resource "github_repository_vulnerability_alerts" "alert" {
-  repository = github_repository.repo.name
+  for_each   = tomap(var.repos)
+  repository = github_repository.repo[each.key].name
   enabled    = true
 }
 
 resource "null_resource" "disable_external_pr" {
+  for_each = tomap(var.repos)
   triggers = {
-    repo_name = github_repository.repo.name
+    repo_name = github_repository.repo[each.key].name
   }
 
   provisioner "local-exec" {
     command = <<EOT
-      gh api --method PATCH "/repos/${var.github_owner}/${var.repo_name}" \
+      gh api --method PATCH "/repos/${var.github_owner}/${github_repository.repo[each.key].name}" \
         -f "pull_request_creation_policy=collaborators_only"
     EOT
   }
