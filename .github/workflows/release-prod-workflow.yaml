@@ -18,7 +18,7 @@ permissions:
 jobs:
   flattened-terraform-release-workflow:
     name: Terraform Release Workflow
-    uses: eingram-homelab/reusable-workflows/.github/workflows/_flattened-terraform-release-workflow.yaml@update-release-workflow
+    uses: eingram-homelab/reusable-workflows/.github/workflows/_flattened-terraform-release-workflow.yaml@main
     with:
       repository: ${{ github.repository }}
       ref: ${{ github.ref_name }}
