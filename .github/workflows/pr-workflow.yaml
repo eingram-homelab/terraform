@@ -4,7 +4,7 @@ name: PR Workflow / Terraform
 on:
   pull_request:
     branches:
-      - test-release-branch
+      - main
 
 permissions:
   contents: read
