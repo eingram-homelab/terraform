@@ -3,37 +3,13 @@ variable "github_owner" {
   type        = string
 }
 
-variable "repo_name" {
-  description = "The name of the GitHub repository."
-  type        = string
-}
-
-variable "repo_visibility" {
-  description = "The visibility of the GitHub repository (public, private, or internal)."
-  type        = string
-  default     = "private"
-}
-
-variable "default_branch" {
-  description = "The default branch of the GitHub repository."
-  type        = string
-  default     = "main"
-}
-
-variable "required_approving_review_count" {
-  description = "The number of required approving reviews for pull requests."
-  type        = number
-  default     = 0
-}
-
-variable "template_owner" {
-  description = "Owner of template repo."
-  type        = string
-  default     = ""
-}
-
-variable "template_repo" {
-  description = "Template repo name."
-  type        = string
-  default     = ""
+variable "repos" {
+  description = "A map of GitHub repositories and their settings."
+  type = map(object({
+    visibility                      = string
+    default_branch                  = string
+    required_approving_review_count = number
+    template_owner                  = optional(string, "")
+    template_repo                   = optional(string, "")
+  }))
 }
