@@ -3,14 +3,14 @@ provider "azurerm" {
 }
 
 data "azurerm_resource_group" "rg" {
-  name = "HomeLabRG"
+  name = var.resource_group_name
 }
 
 resource "azurerm_log_analytics_workspace" "law" {
-  name                = "HomeLabRG-law-stg"
+  name                = var.log_analytics_workspace_name
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
-  daily_quota_gb      = 1
+  sku                 = var.log_analytics_workspace_sku
+  retention_in_days   = var.log_analytics_retention_in_days
+  daily_quota_gb      = var.log_analytics_daily_quota_gb
 }
