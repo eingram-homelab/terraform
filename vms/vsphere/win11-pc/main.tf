@@ -24,7 +24,6 @@ data "vault_generic_secret" "hladmin_password" {
 
 locals {
   win_admin_password = var.admin_password != null ? var.admin_password : data.vault_generic_secret.win_password.data["win_password"]
-  ssh_password      = data.vault_generic_secret.ssh_password.data["ssh_password"]
   domain_admin_username = var.domain_user != null ? var.domain_user : data.vault_generic_secret.hladmin_username.data["hladmin_username"]
   domain_admin_password = var.domain_password != null ? var.domain_password : data.vault_generic_secret.hladmin_password.data["hladmin_password"]
   ssh_public_key     = var.ssh_key != null ? var.ssh_key : data.vault_generic_secret.ssh_pub_key.data["ssh_pub_key"]
@@ -37,8 +36,8 @@ locals {
   effective_run_once_command_list = length(var.run_once_command_list) > 0 ? var.run_once_command_list : local.default_run_once_command_list
 }
 
-# tflint-ignore: terraform_module_pinned_source
 module "vm" {
+  # tflint-ignore: terraform_module_pinned_source
   source                   = "github.com/eingram-homelab/terraform-mod-vsphere-vm?ref=main" 
   vsphere_datastore_list   = var.vsphere_datastore_list
   vsphere_network_list     = var.vsphere_network_list
@@ -52,6 +51,8 @@ module "vm" {
   is_windows_image         = var.is_windows_image
   vm_folder_name           = var.vm_folder_name
   domain                   = var.domain
+  domain_user              = local.domain_admin_username
+  domain_password          = local.domain_admin_password
   admin_password           = local.win_admin_password
   ssh_key                  = local.ssh_public_key
   run_once_command_list    = local.effective_run_once_command_list
