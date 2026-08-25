@@ -112,6 +112,18 @@ variable "domain" {
   default     = ""
 }
 
+variable "domain_user" {
+  description = "Domain user to join the domain (leave empty to use Vault default)."
+  type        = string
+  default     = null
+}
+
+variable "domain_password" {
+  description = "Domain user password to join the domain (leave empty to use Vault default)."
+  type        = string
+  default     = null
+}
+
 variable "admin_password" {
   description = "Optional override for admin password. If null, value is read from Vault."
   type        = string
