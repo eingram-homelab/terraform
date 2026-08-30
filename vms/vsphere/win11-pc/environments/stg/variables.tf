@@ -115,13 +115,13 @@ variable "domain" {
 variable "domain_user" {
   description = "Domain user to join the domain (leave empty to use Vault default)."
   type        = string
-  default     = null
+  default     = ""
 }
 
 variable "domain_password" {
   description = "Domain user password to join the domain (leave empty to use Vault default)."
   type        = string
-  default     = null
+  default     = ""
 }
 
 variable "admin_password" {

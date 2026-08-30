@@ -51,8 +51,8 @@ module "vm" {
   is_windows_image         = var.is_windows_image
   vm_folder_name           = var.vm_folder_name
   domain                   = var.domain
-  domain_user              = local.domain_admin_username
-  domain_password          = local.domain_admin_password
+  domain_user              = var.domain != "" ? local.domain_admin_username : ""
+  domain_password          = var.domain != "" ? local.domain_admin_password : ""
   admin_password           = local.win_admin_password
   ssh_key                  = local.ssh_public_key
   run_once_command_list    = local.effective_run_once_command_list
