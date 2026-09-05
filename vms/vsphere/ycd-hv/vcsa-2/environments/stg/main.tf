@@ -6,6 +6,10 @@ data "vault_generic_secret" "vsphere_password" {
   path = var.vault_vsphere_secret_path
 }
 
+data "vault_generic_secret" "ssh_password" {
+  path = var.vault_ssh_secret_path
+}
+
 data "vault_generic_secret" "win_password" {
   path = var.vault_win_secret_path
 }
@@ -32,7 +36,7 @@ locals {
 }
 
 module "vm" {
-  source                   = "github.com/eingram-homelab/terraform-mod-vsphere-vm?ref=1d72210139984536571d5a09cf13afa5d79cfc40"
+  source                   = "github.com/eingram-homelab/terraform-mod-vsphere-vm?ref=main"
   vsphere_datacenter       = var.vsphere_datacenter
   vsphere_compute_cluster  = var.vsphere_compute_cluster
   vsphere_datastore_list   = var.vsphere_datastore_list

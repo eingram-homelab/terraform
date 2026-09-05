@@ -6,6 +6,10 @@ data "vault_generic_secret" "vsphere_password" {
   path = var.vault_vsphere_secret_path
 }
 
+data "vault_generic_secret" "ssh_password" {
+  path = var.vault_ssh_secret_path
+}
+
 data "vault_generic_secret" "win_password" {
   path = var.vault_win_secret_path
 }
