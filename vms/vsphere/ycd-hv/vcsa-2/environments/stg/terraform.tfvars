@@ -5,17 +5,17 @@ vsphere_datacenter      = "HomeLab Datacenter 2"
 vsphere_compute_cluster = "AMD R7 Cluster"
 allow_unverified_ssl    = true
 
-vsphere_datastore_list = ["vsanDatastore"]
+vsphere_datastore_list = ["vsanDatastore", "vsanDatastore", "vsanDatastore"] # must align with vm_name_list order
 vm_storage_policy      = "vSAN - No Fault Tolerance"
-vsphere_network_list   = ["DPG-Lab-LAN1"]
-vm_name_list           = ["ycd-hv1"]
+vsphere_network_list   = ["DPG-Lab-LAN1", "DPG-Lab-LAN1", "DPG-Lab-LAN1"] # must align with vm_name_list order
+vm_name_list           = ["ycd-hv1", "ycd-hv2", "ycd-hv3"]
 vm_ram                 = 4096
 vm_cpu                 = 4
 vm_base_disk_size_gb   = [62]
 vm_efi_secure          = false
 
-ip_address_list = ["10.10.0.241"]
-ip_gateway_list = ["10.10.0.1"]
+ip_address_list = ["10.10.0.241", "10.10.0.242", "10.10.0.243"] # must align with vm_name_list order
+ip_gateway_list = ["10.10.0.1", "10.10.0.1", "10.10.0.1"]       # must align with vm_name_list order
 
 dns_suffix_list = ["company.ycdisp.com"]
 dns_server_list = ["192.168.1.251", "192.168.1.250"]
