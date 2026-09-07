@@ -32,7 +32,7 @@ locals {
 }
 
 module "vm" {
-  source                   = "github.com/eingram-homelab/terraform-mod-vsphere-vm?ref=1d72210139984536571d5a09cf13afa5d79cfc40"
+  source                   = "github.com/eingram-homelab/terraform-mod-vsphere-vm?ref=v0.1.1"
   vsphere_datacenter       = var.vsphere_datacenter
   vsphere_compute_cluster  = var.vsphere_compute_cluster
   vsphere_datastore_list   = var.vsphere_datastore_list
