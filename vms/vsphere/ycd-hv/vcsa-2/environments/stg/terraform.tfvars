@@ -37,12 +37,15 @@ domain_user = "admin"
 admin_password = null
 ssh_key        = null
 
+# Enable nested virtualization
+nested_hv_enabled = true
+
 vm_tag_categories = ["Environment"]
 vm_tags           = ["stg"]
 
 vsphere_template = "TMP-Win2025Core_Packer"
 is_windows_image = true
-vm_folder_name   = "Windows/YCD"
+vm_folder_name   = "WindowsYCD"
 
 # Optional override. Leave empty to use default commands from main.tf
 run_once_command_list = []
