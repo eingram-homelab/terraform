@@ -1,4 +1,4 @@
-# terraform.tfvars is loaded automatically by Terraform.
+# terraform.tfvars is loaded automatically by Terraform. 
 
 vsphere_server          = "vcsa-2.company.ycdisp.com"
 vsphere_datacenter      = "HomeLab Datacenter 2"
