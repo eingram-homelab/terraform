@@ -235,3 +235,9 @@ variable "data_disk" {
   type        = any
   default     = {}
 }
+
+variable "nested_hv_enabled" {
+  description = "Enable nested virtualization for VMs."
+  type        = bool
+  default     = false
+}
