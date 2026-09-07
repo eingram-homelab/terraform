@@ -7,12 +7,16 @@ allow_unverified_ssl    = true
 
 vsphere_datastore_list = ["vsanDatastore", "vsanDatastore", "vsanDatastore"] # must align with vm_name_list order
 vm_storage_policy      = "vSAN - No Fault Tolerance"
-vsphere_network_list   = ["DPG-Lab-LAN1", "DPG-Lab-LAN1", "DPG-Lab-LAN1"] # must align with vm_name_list order
-vm_name_list           = ["ycd-hv1", "ycd-hv2", "ycd-hv3"]
-vm_ram                 = 4096
-vm_cpu                 = 4
-vm_base_disk_size_gb   = [62]
-vm_efi_secure          = false
+vsphere_network_list = [ # must align with vm_name_list order; 4 NICs per VM
+  ["DPG-Lab-LAN1", "DPG-Lab-LAN1", "DPG-S2D", "DPG-S2D"],
+  ["DPG-Lab-LAN1", "DPG-Lab-LAN1", "DPG-S2D", "DPG-S2D"],
+  ["DPG-Lab-LAN1", "DPG-Lab-LAN1", "DPG-S2D", "DPG-S2D"]
+]
+vm_name_list         = ["ycd-hv1", "ycd-hv2", "ycd-hv3"]
+vm_ram               = 16384
+vm_cpu               = 4
+vm_base_disk_size_gb = [62]
+vm_efi_secure        = false
 
 ip_address_list = ["10.10.0.241", "10.10.0.242", "10.10.0.243"] # must align with vm_name_list order
 ip_gateway_list = ["10.10.0.1", "10.10.0.1", "10.10.0.1"]       # must align with vm_name_list order
@@ -43,20 +47,32 @@ vm_folder_name   = "Windows/YCD"
 # Optional override. Leave empty to use default commands from main.tf
 run_once_command_list = []
 
-# data_disk = {
-#   disk1 = {
-#     size_gb          = 10,
-#     thin_provisioned = true
-#     #   # datastore_id              = "datastore-90679"
-#     #   vsphere_storage_policy_id = "26d71bd1-1bd5-4721-9bfa-ceb3b22e2e30" # Must match vm setting
-#   }
-#   disk2 = {
-#     size_gb          = 10,
-#     thin_provisioned = true
-#     #   # datastore_id              = "datastore-90679"
-#     #   vsphere_storage_policy_id = "26d71bd1-1bd5-4721-9bfa-ceb3b22e2e30" # Must match vm setting
-#   }
-# }
+data_disk = {
+  disk1 = {
+    size_gb          = 100,
+    thin_provisioned = true
+    #   # datastore_id              = "datastore-90679"
+    #   vsphere_storage_policy_id = "26d71bd1-1bd5-4721-9bfa-ceb3b22e2e30" # Must match vm setting
+  }
+  disk2 = {
+    size_gb          = 100,
+    thin_provisioned = true
+    #   # datastore_id              = "datastore-90679"
+    #   vsphere_storage_policy_id = "26d71bd1-1bd5-4721-9bfa-ceb3b22e2e30" # Must match vm setting
+  }
+  disk3 = {
+    size_gb          = 100,
+    thin_provisioned = true
+    #   # datastore_id              = "datastore-90679"
+    #   vsphere_storage_policy_id = "26d71bd1-1bd5-4721-9bfa-ceb3b22e2e30" # Must match vm setting
+  }
+  disk4 = {
+    size_gb          = 100,
+    thin_provisioned = true
+    #   # datastore_id              = "datastore-90679"
+    #   vsphere_storage_policy_id = "26d71bd1-1bd5-4721-9bfa-ceb3b22e2e30" # Must match vm setting
+  }
+}
 
 # Set these options to true for k8s nodes using vSphere CSI
 enable_disk_uuid      = false
