@@ -73,8 +73,9 @@ data_disk = {
   }
 }
 
-# Set these options to true for k8s nodes using vSphere CSI
-enable_disk_uuid      = false
+enable_disk_uuid      = true
+
+# Set this options to true for k8s nodes using vSphere CSI
 create_vm_permissions = false
 
 # If enabling the above, must set these options to create a user and role for the VM to use for CSI
