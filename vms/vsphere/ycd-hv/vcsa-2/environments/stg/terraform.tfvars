@@ -8,9 +8,9 @@ allow_unverified_ssl    = true
 vsphere_datastore_list = ["vsanDatastore", "vsanDatastore", "vsanDatastore"] # must align with vm_name_list order
 vm_storage_policy      = "vSAN - No Fault Tolerance"
 vsphere_network_list = [ # must align with vm_name_list order; 4 NICs per VM
-  ["DPG-Lab-LAN1", "DPG-LiveMotion", "DPG-S2D"],
-  ["DPG-Lab-LAN1", "DPG-LiveMotion", "DPG-S2D"],
-  ["DPG-Lab-LAN1", "DPG-LiveMotion", "DPG-S2D"]
+  ["DPG-Lab-LAN1", "DPG-LiveMigration", "DPG-S2D"],
+  ["DPG-Lab-LAN1", "DPG-LiveMigration", "DPG-S2D"],
+  ["DPG-Lab-LAN1", "DPG-LiveMigration", "DPG-S2D"]
 ]
 vm_name_list         = ["ycd-hv1", "ycd-hv2", "ycd-hv3"]
 vm_ram               = 16384
@@ -54,26 +54,22 @@ data_disk = {
   disk1 = {
     size_gb          = 100,
     thin_provisioned = true
-    #   # datastore_id              = "datastore-90679"
-    #   vsphere_storage_policy_id = "26d71bd1-1bd5-4721-9bfa-ceb3b22e2e30" # Must match vm setting
+    controller_type  = "sata"
   }
   disk2 = {
     size_gb          = 100,
     thin_provisioned = true
-    #   # datastore_id              = "datastore-90679"
-    #   vsphere_storage_policy_id = "26d71bd1-1bd5-4721-9bfa-ceb3b22e2e30" # Must match vm setting
+    controller_type  = "sata"
   }
   disk3 = {
     size_gb          = 100,
     thin_provisioned = true
-    #   # datastore_id              = "datastore-90679"
-    #   vsphere_storage_policy_id = "26d71bd1-1bd5-4721-9bfa-ceb3b22e2e30" # Must match vm setting
+    controller_type  = "sata"
   }
   disk4 = {
     size_gb          = 100,
     thin_provisioned = true
-    #   # datastore_id              = "datastore-90679"
-    #   vsphere_storage_policy_id = "26d71bd1-1bd5-4721-9bfa-ceb3b22e2e30" # Must match vm setting
+    controller_type  = "sata"
   }
 }
 
