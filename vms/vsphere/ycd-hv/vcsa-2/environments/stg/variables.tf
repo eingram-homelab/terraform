@@ -232,7 +232,7 @@ variable "dns_server_list" {
 
 variable "data_disk" {
   description = "Optional additional disk map consumed by the vm module."
-  type        = any
+  type        = map(map(string))
   default     = {}
 }
 
@@ -240,4 +240,10 @@ variable "nested_hv_enabled" {
   description = "Enable nested virtualization for VMs."
   type        = bool
   default     = false
+}
+
+variable "sata_controller_count" {
+  description = "Number of SATA controllers to create for the VM. Each controller can support up to 30 disks."
+  type        = number
+  default     = 1
 }
